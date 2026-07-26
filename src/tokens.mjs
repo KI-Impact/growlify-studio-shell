@@ -41,6 +41,5 @@ export const MODULES = [
   { key: 'sales',       label: 'Sales',       href: 'https://sales.growlify.de/sales' },
   { key: 'finance',     label: 'Finance',     href: 'https://finance.growlify.de/finance/studio/' },
   { key: 'marketing',   label: 'Marketing',   href: 'https://marketing.growlify.de/content/studio/' },
-  { key: 'transkripte', label: 'Transkripte', href: 'https://transkripte.growlify.de/transkripte' },
   { key: 'eingang',     label: 'Eingang',     href: 'https://eingang.growlify.de/eingang' },
 ];
