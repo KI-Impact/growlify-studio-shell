@@ -9,6 +9,7 @@
 // von Studio-:root-Variablen).
 import { MODULES, TOKENS } from './tokens.mjs';
 import { ICONS } from './components.mjs';
+import { wordmarkSvg } from './logo.mjs';
 
 const T = TOKENS;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -32,6 +33,7 @@ const MOD_ICON = {
 };
 const modIc = (key, size = 16) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none">${MOD_ICON[key] || ''}</svg>`;
 
+
 export function chromeCss() {
   return `<style>
 .gsc-body{margin:0;font-family:${FONT};background:${T.bg};color:${T.fg1}}
@@ -41,7 +43,8 @@ export function chromeCss() {
 .gsc-top-in{display:flex;align-items:center;gap:14px;padding:9px 18px}
 .gsc-burger{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;border:1px solid ${T.border};background:${T.surface2};cursor:pointer;color:${T.fg1};padding:0}
 .gsc-brand{display:flex;align-items:baseline;gap:8px;text-decoration:none}
-.gsc-wm{font-size:20px;font-weight:700;letter-spacing:-.02em;background:${GRAD};-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.gsc-wm{display:inline-flex;align-items:center;height:20px;line-height:0}
+.gsc-wm-svg{display:block;height:100%;width:auto}
 .gsc-tag{font-size:10.5px;color:${T.fg2};border:1px solid ${T.border};border-radius:999px;padding:1px 8px}
 .gsc-mods{display:flex;align-items:center;gap:3px;margin-left:auto;flex-wrap:wrap}
 .gsc-mod{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:500;color:${T.fg2};text-decoration:none;white-space:nowrap}
@@ -113,7 +116,7 @@ export function suiteChrome({
 
   const topbar = `<div class="gsc-top"><div class="gsc-top-in">
     <button type="button" class="gsc-burger" aria-label="Menü" onclick="document.querySelector('.gsc-side').classList.toggle('open');document.querySelector('.gsc-backdrop').classList.toggle('open')">${ic('grid', 17)}</button>
-    <a class="gsc-brand" href="${esc(home)}"><span class="gsc-wm">growlify</span><span class="gsc-tag">Suite</span></a>
+    <a class="gsc-brand" href="${esc(home)}"><span class="gsc-wm">${wordmarkSvg(20)}</span><span class="gsc-tag">Suite</span></a>
     <nav class="gsc-mods" aria-label="Module">${modules.map(pill).join('')}</nav>
   </div></div>`;
 
@@ -201,7 +204,7 @@ export function kundenChrome({
   };
   const topbar = `<div class="gsc-top"><div class="gsc-top-in">
     <button type="button" class="gsc-burger" aria-label="Menü" onclick="document.querySelector('.gsc-side').classList.toggle('open');document.querySelector('.gsc-backdrop').classList.toggle('open')">${ic('grid', 17)}</button>
-    <a class="gsc-brand" href="${esc(homeHref)}"><span class="gsc-wm">growlify</span></a>
+    <a class="gsc-brand" href="${esc(homeHref)}"><span class="gsc-wm">${wordmarkSvg(20)}</span></a>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12.5px">${topRight}</div>
   </div></div>`;
   const studioHead = `<span class="gsc-studio-ic">${ic('heart', 16)}</span><div><div class="gsc-studio-name">${esc(studio)}</div>${subtitle ? `<div class="gsc-studio-sub">${esc(subtitle)}</div>` : ''}</div>`;
