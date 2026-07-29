@@ -17,7 +17,11 @@ DEV="$HOME/Developer"
 SHELL_REPO="$DEV/growlify-studio-shell"
 SPEC_BASE="github:denglermanuel/growlify-studio-shell"
 # Alle Repos, die die Shell über package.json/Lockfile beziehen (Standard-Muster: npm ci im Dockerfile).
-CONSUMERS=(business-brain eingang sales-studio growlify-crm transkripte growlify-portal finance-studio growlify-content)
+# growlify-marketing statt growlify-content: die Coolify-App "Marketing Studio" baut aus
+# denglermanuel/growlify-marketing. growlify-content ist eine veraltete Kopie und wird nicht
+# deployt. Stand hier falsch, dadurch wäre das Marketing Studio bei jedem Rollout stumm
+# ausgelassen worden (am 29.07. an der Coolify-Konfiguration nachgemessen).
+CONSUMERS=(business-brain eingang sales-studio growlify-crm transkripte growlify-portal finance-studio growlify-marketing)
 
 PUSH=0
 VERSION=""

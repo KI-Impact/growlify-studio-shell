@@ -117,6 +117,22 @@ export function mountSuiteAuth(app, opts = {}) {
   } = opts;
   // validate(email, password) → Session-Payload {uid,tenant,role,name} | null  (echte Nutzerverwaltung, im Brain)
   // loginUrl: externe Login-URL (z.B. das Brain), wohin nicht-autoritative Apps unangemeldet umleiten.
+  //
+  // MANDANTEN-SCHRANKE (v0.17.0): Der Passwort-Login ohne validate-Hook mintete früher eine
+  // Session mit fest verdrahtetem tenant 'mavisio'. In einer mandantenfähigen Suite ist das
+  // falsch: eine App würde einen Mandanten behaupten, den ihre Datenbank gar nicht kennt, und
+  // unter Row Level Security still leer laufen. Deshalb gilt jetzt:
+  //   authSecret gesetzt  → NUR validate darf eine Session minten. Apps ohne validate sind
+  //                         nicht-autoritativ und schicken ihre Nutzer über loginUrl zum Brain.
+  //   authSecret NICHT gesetzt → unverändert das alte Basic-Auth-Verhalten über `password`.
+  // Damit bleibt der Rückfallweg für den Betrieb ohne Session vollständig erhalten, und es
+  // gibt keinen Pfad mehr, der einen Mandanten errät.
+  const passwortLoginErlaubt = !authSecret;
+  if (authSecret && !validate && !loginUrl) {
+    // Diese Kombination sperrt jeden aus: Session-Betrieb, keine eigene Nutzerprüfung und kein
+    // Ort, an den umgeleitet werden könnte. Laut statt still, sonst sucht man lange.
+    console.warn('[suite-auth] AUTH_SECRET gesetzt, aber weder validate noch loginUrl: niemand kann sich anmelden.');
+  }
   const logoutPath = loginPath + '/logout';
   const openSet = new Set([...open, loginPath, logoutPath]);
   const isOpen = (p) => openSet.has(p) || openPrefix.some((pre) => p.startsWith(pre));
@@ -124,6 +140,11 @@ export function mountSuiteAuth(app, opts = {}) {
   app.get(loginPath, (req, res) => {
     if (authSecret && verifySession(readCookie(req), authSecret)) return res.redirect(302, req.query.next || '/');
     if (loginUrl) return res.redirect(302, loginUrl + (req.query.next ? '?next=' + encodeURIComponent(req.query.next) : ''));
+    // Ohne validate und ohne erlaubten Passwort-Login gäbe die Maske ein Feld aus, das nichts
+    // mehr bewirkt. Dann lieber eine ehrliche Ansage als ein Formular, das immer fehlschlägt.
+    if (authSecret && !validate) {
+      return res.status(503).type('html').send(loginPage({ title, next: '', error: true, action: loginPath, withEmail: false }));
+    }
     res.type('html').send(loginPage({ title, next: req.query.next || '', error: req.query.e === '1', action: loginPath, withEmail: !!validate }));
   });
   app.post(loginPath, async (req, res) => {
@@ -132,7 +153,7 @@ export function mountSuiteAuth(app, opts = {}) {
     let payload = null;
     if (validate) {
       try { payload = await validate(body.email, body.password); } catch { payload = null; }
-    } else if (password && body.password && safeEqual(body.password, password)) {
+    } else if (passwortLoginErlaubt && password && body.password && safeEqual(body.password, password)) {
       payload = { uid: 'admin', tenant: 'mavisio', role: 'owner' };
     }
     if (authSecret && payload) {
