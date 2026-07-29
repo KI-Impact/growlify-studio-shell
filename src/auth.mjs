@@ -134,7 +134,9 @@ export function mountSuiteAuth(app, opts = {}) {
     console.warn('[suite-auth] AUTH_SECRET gesetzt, aber weder validate noch loginUrl: niemand kann sich anmelden.');
   }
   const logoutPath = loginPath + '/logout';
-  const openSet = new Set([...open, loginPath, logoutPath]);
+  // /suite/sichtbarkeit prüft sich selbst: ohne Cookie antwortet es "nichts ausblenden".
+  // Es MUSS offen sein, sonst liefert die Auth-Umleitung dem fetch HTML statt JSON.
+  const openSet = new Set([...open, loginPath, logoutPath, '/suite/sichtbarkeit']);
   const isOpen = (p) => openSet.has(p) || openPrefix.some((pre) => p.startsWith(pre));
 
   app.get(loginPath, (req, res) => {
@@ -163,6 +165,35 @@ export function mountSuiteAuth(app, opts = {}) {
     }
     res.redirect(302, `${loginPath}?e=1${next ? '&next=' + encodeURIComponent(next) : ''}`);
   });
+  // Same-Origin-Proxy für die Modul-Sichtbarkeit (v0.18.0).
+  //
+  // Warum ein Proxy und nicht ein direkter Aufruf des Brains aus dem Browser: das
+  // Session-Cookie trägt SameSite=Lax und würde bei einem Cross-Origin-fetch gar nicht
+  // mitgeschickt. Der Studio-Server hat es dagegen ohnehin in der Hand und reicht es weiter.
+  // Damit autorisiert das Brain den echten Nutzer, nicht das Studio, und es braucht kein
+  // zusätzliches Vertrauensverhältnis zwischen den Apps.
+  //
+  // Liegt hier in mountSuiteAuth, damit jedes Studio die Route allein durch den
+  // Versionssprung bekommt und keine eigene Zeile Code braucht.
+  const brainUrl = (opts.brainUrl || (loginUrl ? loginUrl.replace(/\/login\/?$/, '') : '')).replace(/\/$/, '');
+  app.get('/suite/sichtbarkeit', async (req, res) => {
+    // Fehler heißt hier immer "nichts ausblenden" (alle: true). Einem Nutzer stillschweigend
+    // bezahlte Module wegzunehmen wäre schlimmer als ein Link zu viel.
+    const offen = { ok: false, alle: true, module: {} };
+    if (!brainUrl) return res.json(offen);
+    const cookie = req.headers.cookie || '';
+    if (!cookie.includes(COOKIE + '=')) return res.json(offen);
+    try {
+      const r = await fetch(brainUrl + '/business/api/sichtbarkeit', {
+        headers: { cookie }, redirect: 'manual', signal: AbortSignal.timeout(4000),
+      });
+      if (!r.ok) return res.json(offen);
+      const j = await r.json();
+      res.set('cache-control', 'private, max-age=60');
+      return res.json(j && typeof j === 'object' ? j : offen);
+    } catch { return res.json(offen); }
+  });
+
   const doLogout = (req, res) => { res.set('Set-Cookie', cookieHeader('', { domain: cookieDomain, clear: true })); res.redirect(302, loginPath); };
   app.get(logoutPath, doLogout);
   app.post(logoutPath, doLogout);

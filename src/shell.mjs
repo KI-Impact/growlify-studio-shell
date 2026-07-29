@@ -1,7 +1,7 @@
 // shell.mjs — die sichtbaren Suite-Komponenten. Framework-frei, geben HTML-Strings zurück.
 // suiteTopbar ist SELBST-ENTHALTEN (Inline-Styles), passt ohne CSS-Import in jedes Studio.
 // systemSection nutzt die baseCss-Klassen (für Studios, die das Fundament adoptieren).
-import { MODULES, TOKENS } from './tokens.mjs';
+import { MODULES, TOKENS, sichtbarkeitScript } from './tokens.mjs';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -17,7 +17,9 @@ const dotBg = (s) => (s === 'ok' ? T.ok : s === 'warn' ? T.warn : s === 'fail' ?
 //   health   : optionaler Server-seitiger Startwert { <key>: 'ok'|'warn'|'fail'|'still' }
 //   links    : { <key>: 'https://…' } überschreibt die Default-Modul-URLs
 //   homeHref : Ziel der Wortmarke. Default: die Brain-Übersicht.
-export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '', statusUrl = '', modules = MODULES } = {}) {
+// sichtbarkeitUrl: Same-Origin-Proxy aus mountSuiteAuth. Auch die Drop-in-Komponenten hängen
+// das Filter-Skript selbst an, damit die Kopplung auch ohne suiteChrome greift.
+export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '', statusUrl = '', modules = MODULES, sichtbarkeitUrl = '/suite/sichtbarkeit' } = {}) {
   const home = homeHref || (modules.find((m) => m.key === 'brain') || {}).href || '/';
   const dot = (key, st) => `<span data-mod="${esc(key)}" style="width:7px;height:7px;border-radius:999px;background:${dotBg(st)};display:inline-block"></span>`;
   const pills = modules.map((m) => {
@@ -26,7 +28,7 @@ export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '
     const href = links[m.key] || m.href;
     const base = 'display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:13px;text-decoration:none;white-space:nowrap;';
     const style = cur ? base + `background:${T.fg1};color:${T.onDark};font-weight:500;` : base + `color:${T.fg2};`;
-    return `<a href="${esc(href)}" style="${style}"${cur ? ' aria-current="page"' : ''}>${esc(m.label)}${dot(m.key, st)}</a>`;
+    return `<a data-modlink="${esc(m.key)}" href="${esc(href)}" style="${style}"${cur ? ' aria-current="page"' : ''}>${esc(m.label)}${dot(m.key, st)}</a>`;
   }).join('');
   const summary = modules.map((m) => dot(m.key, health[m.key] || 'still')).join('');
   const live = statusUrl
@@ -42,7 +44,7 @@ export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '
   <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:${T.fg2}">
     <span>Gesundheit</span><span style="display:inline-flex;gap:3px">${summary}</span>
   </div>
-</header>${live}`;
+</header>${live}${sichtbarkeitScript(sichtbarkeitUrl)}`;
 }
 
 // Inline-SVG-Icons, harte Strokes (unabhängig von Studio-CSS). svg(path, color, size).
@@ -61,12 +63,12 @@ const MOD_ICON = {
 // öffnet. Selbst-enthalten, dependency-frei, kugelsicher gegen globale Studio-Styles (alle Werte
 // inline, Icons mit hartem Stroke). Drop-in: das ganze Stück an den Anfang des bestehenden Headers.
 //   active : key des aktuellen Moduls   statusUrl: same-origin-Proxy für Live-Dots (kein Mixed-Content)
-export function suiteLauncher({ active = '', links = {}, statusUrl = '', modules = MODULES } = {}) {
+export function suiteLauncher({ active = '', links = {}, statusUrl = '', modules = MODULES, sichtbarkeitUrl = '/suite/sichtbarkeit' } = {}) {
   const rows = modules.map((m) => {
     const cur = m.key === active;
     const href = links[m.key] || m.href;
     const ic = svg(MOD_ICON[m.key] || '', cur ? T.brandInk : T.fg2, 17);
-    return `<a href="${esc(href)}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;text-decoration:none;${cur ? `background:${T.surface2};` : ''}">`
+    return `<a data-modlink="${esc(m.key)}" href="${esc(href)}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;text-decoration:none;${cur ? `background:${T.surface2};` : ''}">`
       + `${ic}<span style="flex:1;color:${T.fg1};font-size:14px;${cur ? 'font-weight:600;' : ''}">${esc(m.label)}</span>`
       + `${cur ? `<span style="font-size:11px;color:${T.fg3}">hier</span>` : ''}`
       + `<span data-mod="${esc(m.key)}" style="width:8px;height:8px;border-radius:999px;background:${STILL};display:inline-block;flex:none"></span></a>`;
@@ -85,6 +87,7 @@ export function suiteLauncher({ active = '', links = {}, statusUrl = '', modules
     <div style="padding:6px">${rows}</div>
   </div>
   <script>(function(){document.addEventListener('click',function(e){var p=document.querySelector('#growlify-suite [data-suite-pop]');if(p&&!e.target.closest('#growlify-suite'))p.style.display='none';});${live}})();</script>
+  ${sichtbarkeitScript(sichtbarkeitUrl)}
 </div>`;
 }
 

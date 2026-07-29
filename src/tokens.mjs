@@ -43,3 +43,19 @@ export const MODULES = [
   { key: 'marketing',   label: 'Marketing',   href: 'https://marketing.growlify.de/content/studio/' },
   { key: 'eingang',     label: 'Eingang',     href: 'https://eingang.growlify.de/eingang' },
 ];
+
+// Modul-Leiste an Sichtbarkeit koppeln (v0.18.0).
+//
+// Der Endpunkt beantwortet zwei Fragen zugleich: hat das UNTERNEHMEN das Ressort gebucht
+// (Entitlements), und darf DIESER NUTZER es sehen (user_bereiche). Nur wenn beides zutrifft,
+// bleibt der Link stehen.
+//
+// Das ist ausdrücklich KOMFORT, keine Sicherheitsgrenze: ein ausgeblendeter Link hält
+// niemanden auf, der die URL kennt. Die echte Grenze ist Auth und RLS des Studios.
+// Deshalb auch das Fehlerverhalten: schlägt der Aufruf fehl, wird NICHTS ausgeblendet.
+// Einem Nutzer stillschweigend Module wegzunehmen, die er bezahlt hat, wäre der schlimmere
+// Fehler als einen Link zu zeigen, der ohnehin hinter einer echten Prüfung liegt.
+export function sichtbarkeitScript(url) {
+  if (!url) return '';
+  return `<script>(function(){fetch(${JSON.stringify(url)},{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){if(!d||d.alle||!d.module)return;document.querySelectorAll('[data-modlink]').forEach(function(e){if(d.module[e.getAttribute('data-modlink')]===false)e.style.display='none'})}).catch(function(){})})();</script>`;
+}

@@ -7,7 +7,7 @@
 // <body>-Innere zurück. Das Studio entfernt seinen eigenen Header und legt seinen Seiteninhalt
 // als content hinein. Selbst-enthalten: eigenes CSS (gsc-Präfix, Hex-Tokens, keine Abhängigkeit
 // von Studio-:root-Variablen).
-import { MODULES, TOKENS } from './tokens.mjs';
+import { MODULES, TOKENS, sichtbarkeitScript } from './tokens.mjs';
 import { ICONS } from './components.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
@@ -95,16 +95,19 @@ export function suiteChrome({
   active = '', studio = '', subtitle = '', studioHref = '', nav = [], footerNav = [],
   statusUrl = '', homeHref = '', links = {}, modules = MODULES, content = '',
   jarvis = true, jarvisUrl = 'https://brain.growlify.de/business/jarvis',
+  // Same-Origin-Proxy, den mountSuiteAuth in jedem Studio mitbringt. Leerer String schaltet
+  // die Kopplung ab (z.B. für Seiten ohne Suite-Session).
+  sichtbarkeitUrl = '/suite/sichtbarkeit',
 } = {}) {
   const home = homeHref || (modules.find((m) => m.key === 'brain') || {}).href || '/';
 
   const pill = (m) => {
     const cur = m.key === active;
-    return `<a class="gsc-mod" href="${esc(links[m.key] || m.href)}"${cur ? ' aria-current="page"' : ''}>${esc(m.label)}<span class="gsc-dot" data-mod="${esc(m.key)}"></span></a>`;
+    return `<a class="gsc-mod" data-modlink="${esc(m.key)}" href="${esc(links[m.key] || m.href)}"${cur ? ' aria-current="page"' : ''}>${esc(m.label)}<span class="gsc-dot" data-mod="${esc(m.key)}"></span></a>`;
   };
   const sideMod = (m) => {
     const cur = m.key === active;
-    return `<a class="gsc-item${cur ? ' on' : ''}" href="${esc(links[m.key] || m.href)}">${modIc(m.key)}<span>${esc(m.label)}</span><span class="gsc-dot" data-mod="${esc(m.key)}" style="margin-left:auto"></span></a>`;
+    return `<a class="gsc-item${cur ? ' on' : ''}" data-modlink="${esc(m.key)}" href="${esc(links[m.key] || m.href)}">${modIc(m.key)}<span>${esc(m.label)}</span><span class="gsc-dot" data-mod="${esc(m.key)}" style="margin-left:auto"></span></a>`;
   };
   const navItem = (n) => {
     const inner = `${n.icon ? ic(n.icon) : ''}<span>${esc(n.label)}</span>`;
@@ -133,7 +136,7 @@ export function suiteChrome({
     ? `<script>(function(){var C={ok:${JSON.stringify(T.ok)},warn:${JSON.stringify(T.warn)},fail:${JSON.stringify(T.fail)}};fetch(${JSON.stringify(statusUrl)}).then(function(r){return r.json()}).then(function(d){if(!d||!d.modules)return;document.querySelectorAll('.gsc-dot[data-mod]').forEach(function(e){var s=d.modules[e.getAttribute('data-mod')];e.style.background=C[s]||${JSON.stringify(STILL)}})}).catch(function(){})})();</script>`
     : '';
 
-  return `${chromeCss()}${topbar}<div class="gsc-shell">${sidebar}<div class="gsc-backdrop" onclick="document.querySelector('.gsc-side').classList.remove('open');this.classList.remove('open')"></div><main class="gsc-main">${content}</main></div>${live}${jarvis ? jarvisOrb(jarvisUrl) : ''}`;
+  return `${chromeCss()}${topbar}<div class="gsc-shell">${sidebar}<div class="gsc-backdrop" onclick="document.querySelector('.gsc-side').classList.remove('open');this.classList.remove('open')"></div><main class="gsc-main">${content}</main></div>${live}${sichtbarkeitScript(sichtbarkeitUrl)}${jarvis ? jarvisOrb(jarvisUrl) : ''}`;
 }
 
 // Jarvis-Orb (v0.16): schwebender „Datenball" rechts unten in jedem Studio. Klick öffnet einen
