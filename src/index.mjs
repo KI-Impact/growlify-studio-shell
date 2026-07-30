@@ -51,6 +51,9 @@ tbody tr:hover{background:var(--surface2)}
 
 export { suiteTopbar, suiteLauncher } from './shell.mjs';
 export { suiteChrome, kundenChrome, chromeCss, jarvisOrb } from './chrome.mjs';
+// Für Seiten, die eine eigene Kopfleiste bauen statt suiteChrome zu nehmen (z.B. das
+// Anbieter-Portal /admin). Damit muss niemand die Wortmarke nachbauen.
+export { wordmarkSvg } from './logo.mjs';
 export { systemSection, systemCss, healthRows, feedRows, learningRows, fmtDe, ART_LABEL } from './system.mjs';
 export { ensureSyslog, logEvent, readFeed } from './syslog.mjs';
 export { MODULES as modules } from './tokens.mjs';
