@@ -1,6 +1,6 @@
 {
   "name": "@growlify/studio-shell",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Geteilte Suite-Shell für die Growlify-Studios: Tokens, Topbar mit Modul-Switcher, System-Sektion. Framework-frei, server-rendered (HTML-Strings).",
   "type": "module",
   "main": "src/index.mjs",
