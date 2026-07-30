@@ -42,6 +42,7 @@ export const MODULES = [
   { key: 'finance',     label: 'Finance',     href: 'https://finance.growlify.de/finance/studio/' },
   { key: 'marketing',   label: 'Marketing',   href: 'https://marketing.growlify.de/content/studio/' },
   { key: 'eingang',     label: 'Eingang',     href: 'https://eingang.growlify.de/eingang' },
+  { key: 'prozesse',    label: 'Prozesse',    href: 'https://prozesse.growlify.de/prozess' },
 ];
 
 // Modul-Leiste an Sichtbarkeit koppeln (v0.18.0).
