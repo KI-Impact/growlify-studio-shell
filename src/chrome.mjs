@@ -142,6 +142,9 @@ export function suiteChrome({
 // Jarvis-Orb (v0.16): schwebender „Datenball" rechts unten in jedem Studio. Klick öffnet einen
 // Drawer mit dem eingebetteten Jarvis (Brain). Selbst-enthalten: eigenes CSS/JS, kein Framework.
 // Das iframe lädt erst beim ersten Öffnen (data-src), damit der Orb keine Last erzeugt.
+// allow="microphone" ist Pflicht, seit Jarvis ein Mikrofon hat: Ohne diese Delegation lehnt der
+// Browser getUserMedia im iframe SOFORT ab und fragt den Nutzer gar nicht erst. Das sieht dann
+// aus, als hätte er die Freigabe verweigert, obwohl er nie gefragt wurde (31.07.2026 gemessen).
 export function jarvisOrb(url = 'https://brain.growlify.de/business/jarvis') {
   const dots = [
     // [Ring-Radius, Winkel°, Punktgröße, Farbe, Pulsverzögerung s] — bewusst unregelmäßig, „Datenfluss".
@@ -186,7 +189,7 @@ export function jarvisOrb(url = 'https://brain.growlify.de/business/jarvis') {
 </button>
 <aside class="gsc-jvs-drawer" aria-label="Jarvis">
   <div class="gsc-jvs-head"><span class="dot"></span>Jarvis<a href="${esc(url)}" target="_blank" rel="noopener">im Brain öffnen ↗</a><button type="button" aria-label="Schließen" onclick="this.closest('.gsc-jvs-drawer').classList.remove('open')">✕</button></div>
-  <iframe class="gsc-jvs-frame" data-src="${esc(url)}${url.includes('?') ? '&' : '?'}embed=1" title="Jarvis"></iframe>
+  <iframe class="gsc-jvs-frame" allow="microphone" data-src="${esc(url)}${url.includes('?') ? '&' : '?'}embed=1" title="Jarvis"></iframe>
 </aside>
 <script>document.addEventListener('keydown',function(e){if(e.key==='Escape'){var d=document.querySelector('.gsc-jvs-drawer');if(d)d.classList.remove('open')}})</script>`;
 }
