@@ -21,7 +21,9 @@ SPEC_BASE="github:denglermanuel/growlify-studio-shell"
 # denglermanuel/growlify-marketing. growlify-content ist eine veraltete Kopie und wird nicht
 # deployt. Stand hier falsch, dadurch wäre das Marketing Studio bei jedem Rollout stumm
 # ausgelassen worden (am 29.07. an der Coolify-Konfiguration nachgemessen).
-CONSUMERS=(business-brain eingang sales-studio growlify-crm transkripte growlify-portal finance-studio growlify-marketing)
+# prozess-studio am 02.08. nachgetragen: es bezieht die Shell seit v0.20.0, stand aber nie in
+# dieser Liste und wäre bei jedem Rollout stumm auf der alten Version zurückgeblieben.
+CONSUMERS=(business-brain eingang sales-studio growlify-crm transkripte growlify-portal finance-studio growlify-marketing prozess-studio)
 
 PUSH=0
 VERSION=""
