@@ -177,21 +177,27 @@ export function mountSuiteAuth(app, opts = {}) {
   // Versionssprung bekommt und keine eigene Zeile Code braucht.
   const brainUrl = (opts.brainUrl || (loginUrl ? loginUrl.replace(/\/login\/?$/, '') : '')).replace(/\/$/, '');
   app.get('/suite/sichtbarkeit', async (req, res) => {
-    // Fehler heißt hier immer "nichts ausblenden" (alle: true). Einem Nutzer stillschweigend
-    // bezahlte Module wegzunehmen wäre schlimmer als ein Link zu viel.
+    // Zwei unterschiedliche Fehlerfälle: fehlt das Session-Cookie ganz, ist der Nutzer noch
+    // gar nicht angemeldet, dann bleibt es beim alten "nichts ausblenden" (alle: true).
+    // Ist eine Session da, aber die Brain-Antwort kommt nicht zustande (kein brainUrl,
+    // !r.ok, Timeout, Exception, kein Objekt), fällt es restriktiv zurück (streng: true,
+    // leeres module). Zusammen mit der Client-Regel bleiben dann nur das eigene Studio und
+    // Brain stehen statt der vollen Liste, das ist für einen Fremdmandanten das sicherere
+    // Verhalten als "alles anzeigen".
     const offen = { ok: false, alle: true, module: {} };
-    if (!brainUrl) return res.json(offen);
+    const restriktiv = { ok: false, alle: false, streng: true, module: {} };
     const cookie = req.headers.cookie || '';
     if (!cookie.includes(COOKIE + '=')) return res.json(offen);
+    if (!brainUrl) return res.json(restriktiv);
     try {
       const r = await fetch(brainUrl + '/business/api/sichtbarkeit', {
         headers: { cookie }, redirect: 'manual', signal: AbortSignal.timeout(4000),
       });
-      if (!r.ok) return res.json(offen);
+      if (!r.ok) return res.json(restriktiv);
       const j = await r.json();
       res.set('cache-control', 'private, max-age=60');
-      return res.json(j && typeof j === 'object' ? j : offen);
-    } catch { return res.json(offen); }
+      return res.json(j && typeof j === 'object' ? j : restriktiv);
+    } catch { return res.json(restriktiv); }
   });
 
   const doLogout = (req, res) => { res.set('Set-Cookie', cookieHeader('', { domain: cookieDomain, clear: true })); res.redirect(302, loginPath); };

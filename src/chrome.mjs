@@ -136,7 +136,7 @@ export function suiteChrome({
     ? `<script>(function(){var C={ok:${JSON.stringify(T.ok)},warn:${JSON.stringify(T.warn)},fail:${JSON.stringify(T.fail)}};fetch(${JSON.stringify(statusUrl)}).then(function(r){return r.json()}).then(function(d){if(!d||!d.modules)return;document.querySelectorAll('.gsc-dot[data-mod]').forEach(function(e){var s=d.modules[e.getAttribute('data-mod')];e.style.background=C[s]||${JSON.stringify(STILL)}})}).catch(function(){})})();</script>`
     : '';
 
-  return `${chromeCss()}${topbar}<div class="gsc-shell">${sidebar}<div class="gsc-backdrop" onclick="document.querySelector('.gsc-side').classList.remove('open');this.classList.remove('open')"></div><main class="gsc-main">${content}</main></div>${live}${sichtbarkeitScript(sichtbarkeitUrl)}${jarvis ? jarvisOrb(jarvisUrl) : ''}`;
+  return `${chromeCss()}${topbar}<div class="gsc-shell">${sidebar}<div class="gsc-backdrop" onclick="document.querySelector('.gsc-side').classList.remove('open');this.classList.remove('open')"></div><main class="gsc-main">${content}</main></div>${live}${sichtbarkeitScript(sichtbarkeitUrl, active)}${jarvis ? jarvisOrb(jarvisUrl) : ''}`;
 }
 
 // Jarvis-Orb (v0.16): schwebender „Datenball" rechts unten in jedem Studio. Klick öffnet einen

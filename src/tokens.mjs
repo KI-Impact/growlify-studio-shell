@@ -45,18 +45,20 @@ export const MODULES = [
   { key: 'prozesse',    label: 'Prozesse',    href: 'https://prozesse.growlify.de/prozess' },
 ];
 
-// Modul-Leiste an Sichtbarkeit koppeln (v0.18.0).
+// Modul-Leiste an Sichtbarkeit koppeln (v0.18.0, verschaerft v0.23.0).
 //
 // Der Endpunkt beantwortet zwei Fragen zugleich: hat das UNTERNEHMEN das Ressort gebucht
 // (Entitlements), und darf DIESER NUTZER es sehen (user_bereiche). Nur wenn beides zutrifft,
-// bleibt der Link stehen.
+// bleibt der Link stehen. Das eigene Studio (active) und Brain bleiben immer erreichbar,
+// unabhaengig von der Antwort.
 //
 // Das ist ausdrücklich KOMFORT, keine Sicherheitsgrenze: ein ausgeblendeter Link hält
 // niemanden auf, der die URL kennt. Die echte Grenze ist Auth und RLS des Studios.
-// Deshalb auch das Fehlerverhalten: schlägt der Aufruf fehl, wird NICHTS ausgeblendet.
-// Einem Nutzer stillschweigend Module wegzunehmen, die er bezahlt hat, wäre der schlimmere
-// Fehler als einen Link zu zeigen, der ohnehin hinter einer echten Prüfung liegt.
-export function sichtbarkeitScript(url) {
+// d.alle bedeutet weiterhin: nichts ausblenden. Bei d.streng listet d.module ALLE Module
+// vollständig, ein dort fehlendes Modul gilt als nicht sichtbar und wird ausgeblendet
+// (deckt u.a. neue Module ab, die der Server noch nicht kennt). Ohne streng bleibt das
+// alte Verhalten: nur explizit false ausblenden.
+export function sichtbarkeitScript(url, active) {
   if (!url) return '';
-  return `<script>(function(){fetch(${JSON.stringify(url)},{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){if(!d||d.alle||!d.module)return;document.querySelectorAll('[data-modlink]').forEach(function(e){if(d.module[e.getAttribute('data-modlink')]===false)e.style.display='none'})}).catch(function(){})})();</script>`;
+  return `<script>(function(){fetch(${JSON.stringify(url)},{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){if(!d||d.alle)return;var a=${JSON.stringify(active)};document.querySelectorAll('[data-modlink]').forEach(function(e){var k=e.getAttribute('data-modlink');if(k==='brain'||k===a)return;var m=d.module||{};if(m[k]===false||(d.streng===true&&!(k in m)))e.style.display='none'})}).catch(function(){})})();</script>`;
 }
