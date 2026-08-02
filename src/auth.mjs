@@ -176,6 +176,19 @@ export function mountSuiteAuth(app, opts = {}) {
   // Liegt hier in mountSuiteAuth, damit jedes Studio die Route allein durch den
   // Versionssprung bekommt und keine eigene Zeile Code braucht.
   const brainUrl = (opts.brainUrl || (loginUrl ? loginUrl.replace(/\/login\/?$/, '') : '')).replace(/\/$/, '');
+  // Der restriktive Rückfall nimmt einem angemeldeten Nutzer sichtbar Module weg. Das darf
+  // nicht still passieren, sonst sucht bei einem fehlenden SUITE_LOGIN_URL oder einem
+  // Brain-Ausfall niemand an der richtigen Stelle. Gedrosselt auf eine Meldung je Minute,
+  // damit ein längerer Ausfall das Log nicht flutet.
+  let letzteWarnung = 0;
+  const warnUndRestriktiv = (grund, antwort) => {
+    const jetzt = Date.now();
+    if (jetzt - letzteWarnung > 60000) {
+      letzteWarnung = jetzt;
+      console.warn(`[suite-sichtbarkeit] Rückfall auf eigenes Studio + Brain: ${grund || 'unbekannt'}`);
+    }
+    return antwort;
+  };
   app.get('/suite/sichtbarkeit', async (req, res) => {
     // Zwei unterschiedliche Fehlerfälle: fehlt das Session-Cookie ganz, ist der Nutzer noch
     // gar nicht angemeldet, dann bleibt es beim alten "nichts ausblenden" (alle: true).
@@ -188,16 +201,17 @@ export function mountSuiteAuth(app, opts = {}) {
     const restriktiv = { ok: false, alle: false, streng: true, module: {} };
     const cookie = req.headers.cookie || '';
     if (!cookie.includes(COOKIE + '=')) return res.json(offen);
-    if (!brainUrl) return res.json(restriktiv);
+    if (!brainUrl) return res.json(warnUndRestriktiv('kein brainUrl (SUITE_LOGIN_URL fehlt)', restriktiv));
     try {
       const r = await fetch(brainUrl + '/business/api/sichtbarkeit', {
         headers: { cookie }, redirect: 'manual', signal: AbortSignal.timeout(4000),
       });
-      if (!r.ok) return res.json(restriktiv);
+      if (!r.ok) return res.json(warnUndRestriktiv('Brain antwortet ' + r.status, restriktiv));
       const j = await r.json();
       res.set('cache-control', 'private, max-age=60');
-      return res.json(j && typeof j === 'object' ? j : restriktiv);
-    } catch { return res.json(restriktiv); }
+      if (!j || typeof j !== 'object') return res.json(warnUndRestriktiv('Antwort ist kein Objekt', restriktiv));
+      return res.json(j);
+    } catch (err) { return res.json(warnUndRestriktiv(err && err.message, restriktiv)); }
   });
 
   const doLogout = (req, res) => { res.set('Set-Cookie', cookieHeader('', { domain: cookieDomain, clear: true })); res.redirect(302, loginPath); };
