@@ -36,6 +36,7 @@ export const ICONS = {
   wallet: '<path d="M4 7a2 2 0 0 1 2-2h11v4"/><path d="M4 7v10a2 2 0 0 0 2 2h13V9H6a2 2 0 0 1-2-2z"/><circle cx="16" cy="14" r="1.2"/>',
   receipt: '<path d="M6 3l1.5 1.5L9 3l1.5 1.5L12 3l1.5 1.5L15 3l1.5 1.5L18 3v18l-1.5-1.5L15 21l-1.5-1.5L12 21l-1.5-1.5L9 21l-1.5-1.5L6 21z"/><path d="M9 8h6"/><path d="M9 12h6"/>',
   building: '<path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M15 9h3a1 1 0 0 1 1 1v11"/><path d="M8 8h2M8 12h2M8 16h2"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5l-5-5"/><path d="M21 12H9"/>',
 };
 
 // icon('users') → Inline-SVG. cls steuert die Größe (.ic Standard, .ic nav-ic, .ic sec-ic).

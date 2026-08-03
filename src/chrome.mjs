@@ -65,6 +65,10 @@ export function chromeCss() {
 .gsc-item.on{color:#0B6B43;background:linear-gradient(135deg,rgba(19,228,137,.15),rgba(35,178,207,.13));font-weight:600}
 .gsc-item.on svg{opacity:1}
 .gsc-side-foot{margin-top:auto;padding-top:12px;border-top:1px solid ${T.border};display:flex;flex-direction:column;gap:2px}
+.gsc-account{padding-top:10px;margin-top:10px;border-top:1px solid ${T.border};display:flex;flex-direction:column;gap:3px}
+.gsc-account-mail{padding:0 10px;font-size:11.5px;color:${T.fg3};overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gsc-account .gsc-item{color:${T.fg3};font-size:12.5px;padding:6px 10px}
+.gsc-account .gsc-item:hover{color:${T.fg1}}
 .gsc-main{flex:1;min-width:0}
 .gsc-backdrop{display:none}
 /* ---- Mobil: Drawer ---- */
@@ -98,6 +102,10 @@ export function suiteChrome({
   // Same-Origin-Proxy, den mountSuiteAuth in jedem Studio mitbringt. Leerer String schaltet
   // die Kopplung ab (z.B. für Seiten ohne Suite-Session).
   sichtbarkeitUrl = '/suite/sichtbarkeit',
+  // Konto-Fuß (03.08.): angemeldetes Konto + Abmelden-Link, unten in der Seitenleiste, auf JEDER
+  // Seite sichtbar (Befund Manuel: es gab nirgends einen sichtbaren Abmelden-Weg). { email,
+  // logoutHref } — null lässt den Block weg (z.B. Seiten ohne Suite-Session).
+  account = null,
 } = {}) {
   const home = homeHref || (modules.find((m) => m.key === 'brain') || {}).href || '/';
 
@@ -129,6 +137,7 @@ export function suiteChrome({
     ${studioHref ? `<a class="gsc-studio" href="${esc(studioHref)}" style="text-decoration:none;color:inherit" title="${esc(studio)} · Start">${studioHead}</a>` : `<div class="gsc-studio">${studioHead}</div>`}
     <nav class="gsc-nav" aria-label="${esc(studio)}">${nav.map(navItem).join('')}</nav>
     ${footerNav.length ? `<div class="gsc-side-foot">${footerNav.map(navItem).join('')}</div>` : ''}
+    ${account ? `<div class="gsc-account">${account.email ? `<div class="gsc-account-mail" title="${esc(account.email)}">${esc(account.email)}</div>` : ''}<a class="gsc-item" href="${esc(account.logoutHref || '/login/logout')}" target="_top">${ic('logout')}<span>Abmelden</span></a></div>` : ''}
     <div class="gsc-side-mods"><span class="gsc-lbl">Growlify Suite</span>${modules.map(sideMod).join('')}</div>
   </aside>`;
 
