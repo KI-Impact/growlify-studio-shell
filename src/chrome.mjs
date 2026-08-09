@@ -42,8 +42,10 @@ export function chromeCss() {
 .gsc-top::after{content:"";display:block;height:2px;background:${GRAD};opacity:.75}
 .gsc-top-in{display:flex;align-items:center;gap:14px;padding:9px 18px}
 .gsc-burger{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;border:1px solid ${T.border};background:${T.surface2};cursor:pointer;color:${T.fg1};padding:0}
-.gsc-brand{display:flex;align-items:baseline;gap:8px;text-decoration:none}
-.gsc-wm{display:inline-flex;align-items:center;height:20px;line-height:0}
+/* Mittelachse statt Baseline: die Wortmarke ist eine Grafik, der Chip daneben Text —
+   auf einer gemeinsamen Baseline laufen die beiden zwangslaeufig auseinander. */
+.gsc-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.gsc-wm{display:inline-flex;align-items:center;height:22px;line-height:0}
 .gsc-wm-img{display:block;height:100%;width:auto}
 .gsc-tag{font-size:10.5px;color:${T.fg2};border:1px solid ${T.border};border-radius:999px;padding:1px 8px}
 .gsc-mods{display:flex;align-items:center;gap:3px;margin-left:auto;flex-wrap:wrap}
@@ -127,7 +129,7 @@ export function suiteChrome({
 
   const topbar = `<div class="gsc-top"><div class="gsc-top-in">
     <button type="button" class="gsc-burger" aria-label="Menü" onclick="document.querySelector('.gsc-side').classList.toggle('open');document.querySelector('.gsc-backdrop').classList.toggle('open')">${ic('grid', 17)}</button>
-    <a class="gsc-brand" href="${esc(home)}"><span class="gsc-wm">${wordmarkSvg(20)}</span><span class="gsc-tag">Business Studio</span></a>
+    <a class="gsc-brand" href="${esc(home)}"><span class="gsc-wm">${wordmarkSvg(22)}</span><span class="gsc-tag">Business Studio</span></a>
     <nav class="gsc-mods" aria-label="Module">${modules.map(pill).join('')}</nav>
   </div></div>`;
 
@@ -219,7 +221,7 @@ export function kundenChrome({
   };
   const topbar = `<div class="gsc-top"><div class="gsc-top-in">
     <button type="button" class="gsc-burger" aria-label="Menü" onclick="document.querySelector('.gsc-side').classList.toggle('open');document.querySelector('.gsc-backdrop').classList.toggle('open')">${ic('grid', 17)}</button>
-    <a class="gsc-brand" href="${esc(homeHref)}"><span class="gsc-wm">${wordmarkSvg(20)}</span></a>
+    <a class="gsc-brand" href="${esc(homeHref)}"><span class="gsc-wm">${wordmarkSvg(22)}</span></a>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12.5px">${topRight}</div>
   </div></div>`;
   const studioHead = `<span class="gsc-studio-ic">${ic('heart', 16)}</span><div><div class="gsc-studio-name">${esc(studio)}</div>${subtitle ? `<div class="gsc-studio-sub">${esc(subtitle)}</div>` : ''}</div>`;
