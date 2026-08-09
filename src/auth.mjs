@@ -1,8 +1,10 @@
 // auth.mjs — Suite-Auth (Stufe 1: zentraler Login).
 //
 // EIN kombiniertes Express-Middleware-Modul, das zwei Modi kennt:
-//   - AUTH_SECRET gesetzt  → Suite-Session: signiertes Cookie auf .growlify.de, eine Login-Maske,
-//     nahtloser Modulwechsel ohne erneuten Prompt.
+//   - AUTH_SECRET gesetzt  → Suite-Session: signiertes Cookie auf der Domain aus
+//     AUTH_COOKIE_DOMAIN (seit 09.08.2026 .dev.ki-impact.de), eine Login-Maske, nahtloser
+//     Modulwechsel ohne erneuten Prompt. Ein Cookie gilt immer nur unter EINER Domain:
+//     Studios auf einer anderen Domain teilen die Session nicht mit.
 //   - AUTH_SECRET NICHT gesetzt → exakt das bisherige Verhalten: Basic-Auth via password (ADMIN_PASSWORD),
 //     bzw. offen, wenn auch kein password gesetzt ist.
 // Dadurch ist der Code gefahrlos vorab deploybar (schläft, bis AUTH_SECRET gesetzt wird).
