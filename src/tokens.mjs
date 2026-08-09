@@ -65,14 +65,49 @@ export function fontLink() {
 // Einzelne Module lassen sich weiterhin pro Studio via suiteTopbar({ links }) überschreiben.
 export const SUITE_DOMAIN = process.env.SUITE_DOMAIN || 'growlify.de';
 
-const SUBS = {
+// SUB_DEFAULTS ist zugleich die Lesehilfe für die ALTEN Adressen: dort hieß die Subdomain
+// genau wie der Modul-Key. Deshalb bleibt die Tabelle als eigene Konstante stehen und wird
+// nicht in SUBS hineinmutiert — legacyZiel() braucht beide Stände (alt und neu).
+const SUB_DEFAULTS = {
   brain: 'brain', eingang: 'eingang', crm: 'crm', sales: 'sales', marketing: 'marketing',
   finance: 'finance', prozesse: 'prozesse', portal: 'portal', transkripte: 'transkripte',
 };
+const SUBS = { ...SUB_DEFAULTS };
 try { Object.assign(SUBS, JSON.parse(process.env.SUITE_SUBS || '{}')); } catch { /* fehlerhaftes JSON ignorieren, Defaults bleiben */ }
 
 // Basis-URL eines Moduls (ohne Pfad). Unbekannte Keys werden als eigene Subdomain gelesen.
 export function suiteUrl(key, pfad = '') {
+  return `https://${SUBS[key] || key}.${SUITE_DOMAIN}${pfad}`;
+}
+
+// Alt-Domain-Weiche (v0.28.0). Nach dem Umzug auf eine neue SUITE_DOMAIN bleiben die alten
+// Adressen aufgeschaltet, weil in verschickten Mails alte Links stecken. Für die App-Strecke
+// ist das aber eine Falle: das Session-Cookie gilt nur unter EINER Domain, ein Aufruf einer
+// geschützten Seite auf der Alt-Domain lief deshalb in eine Endlos-Schleife
+// (alt → neuer Login → next=alt → wieder Login). Mit SUITE_LEGACY_DOMAIN gesetzt wird daraus
+// ein sauberer 301 auf dieselbe Route unter der neuen Domain.
+//
+//   SUITE_LEGACY_DOMAIN=growlify.de
+//
+// Ohne die Env passiert nichts (bitgenau das bisherige Verhalten). Die öffentlichen Routen
+// einer App sind ausgenommen, das entscheidet der Aufrufer in auth.mjs — hier wird nur die
+// Host-Frage beantwortet.
+export const SUITE_LEGACY_DOMAIN = process.env.SUITE_LEGACY_DOMAIN || '';
+
+// Ziel-URL für einen Aufruf auf einer Alt-Domain, oder null wenn nicht umzuleiten ist.
+// Bewusst konservativ: umgeleitet wird NUR, wenn die erste Host-Ebene einem bekannten
+// Suite-Modul entspricht. Fremde Hosts derselben Alt-Domain (admin., www., ad., app.) bleiben
+// unangetastet, statt auf eine Adresse zu zeigen, die es unter der neuen Domain nicht gibt.
+export function legacyZiel(host, pfad = '/') {
+  // Gleiche Domain alt wie neu hieße Selbst-Redirect. Lieber gar nichts tun.
+  if (!SUITE_LEGACY_DOMAIN || SUITE_LEGACY_DOMAIN === SUITE_DOMAIN || !host) return null;
+  const h = String(host).toLowerCase().split(':')[0];
+  const suffix = '.' + SUITE_LEGACY_DOMAIN.toLowerCase();
+  if (!h.endsWith(suffix)) return null;
+  const label = h.slice(0, -suffix.length);
+  if (!label || label.includes('.')) return null; // mehrstufige Alt-Hosts nicht raten
+  const key = Object.keys(SUB_DEFAULTS).find((k) => SUB_DEFAULTS[k] === label);
+  if (!key) return null;
   return `https://${SUBS[key] || key}.${SUITE_DOMAIN}${pfad}`;
 }
 
