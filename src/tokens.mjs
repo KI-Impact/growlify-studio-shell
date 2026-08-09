@@ -54,17 +54,37 @@ export function fontLink() {
   return `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="${FONT_HREF}">`;
 }
 
-// Die sechs Module der Suite in fester Reihenfolge. Brain ist das Herz (erste Position).
-// Default-Links auf die echten Studio-URLs (Stand 2026-06-29: alle auf *.growlify.de). Pro
-// Studio via suiteTopbar({ links }) überschreibbar.
+// Domain-Schicht (v0.27.0): die Studio-URLs werden nicht mehr hartkodiert, sondern aus einer
+// Basis-Domain plus Subdomain je Modul gebaut. Der Default bleibt exakt der bisherige Stand
+// (*.growlify.de), ein Domain-Wechsel ist damit eine reine Env-Änderung — Voraussetzung für die
+// eigene Instanz auf dev.ki-impact.de und später für Kunden-Instanzen aus denselben Repos.
+//
+//   SUITE_DOMAIN=dev.ki-impact.de
+//   SUITE_SUBS={"prozesse":"prozess"}      // nur nötig, wo die Subdomain abweicht
+//
+// Einzelne Module lassen sich weiterhin pro Studio via suiteTopbar({ links }) überschreiben.
+export const SUITE_DOMAIN = process.env.SUITE_DOMAIN || 'growlify.de';
+
+const SUBS = {
+  brain: 'brain', eingang: 'eingang', crm: 'crm', sales: 'sales', marketing: 'marketing',
+  finance: 'finance', prozesse: 'prozesse', portal: 'portal', transkripte: 'transkripte',
+};
+try { Object.assign(SUBS, JSON.parse(process.env.SUITE_SUBS || '{}')); } catch { /* fehlerhaftes JSON ignorieren, Defaults bleiben */ }
+
+// Basis-URL eines Moduls (ohne Pfad). Unbekannte Keys werden als eigene Subdomain gelesen.
+export function suiteUrl(key, pfad = '') {
+  return `https://${SUBS[key] || key}.${SUITE_DOMAIN}${pfad}`;
+}
+
+// Die Module der Suite in fester Reihenfolge. Brain ist das Herz (erste Position).
 export const MODULES = [
-  { key: 'brain',       label: 'Brain',       href: 'https://brain.growlify.de/business', heart: true },
-  { key: 'eingang',     label: 'Eingang',     href: 'https://eingang.growlify.de/eingang' },
-  { key: 'crm',         label: 'CRM',         href: 'https://crm.growlify.de/crm' },
-  { key: 'sales',       label: 'Sales',       href: 'https://sales.growlify.de/sales' },
-  { key: 'marketing',   label: 'Marketing',   href: 'https://marketing.growlify.de/content/studio/' },
-  { key: 'finance',     label: 'Finance',     href: 'https://finance.growlify.de/finance/studio/' },
-  { key: 'prozesse',    label: 'Prozesse',    href: 'https://prozesse.growlify.de/prozess' },
+  { key: 'brain',       label: 'Brain',       href: suiteUrl('brain', '/business'), heart: true },
+  { key: 'eingang',     label: 'Eingang',     href: suiteUrl('eingang', '/eingang') },
+  { key: 'crm',         label: 'CRM',         href: suiteUrl('crm', '/crm') },
+  { key: 'sales',       label: 'Sales',       href: suiteUrl('sales', '/sales') },
+  { key: 'marketing',   label: 'Marketing',   href: suiteUrl('marketing', '/content/studio/') },
+  { key: 'finance',     label: 'Finance',     href: suiteUrl('finance', '/finance/studio/') },
+  { key: 'prozesse',    label: 'Prozesse',    href: suiteUrl('prozesse', '/prozess') },
 ];
 
 // Modul-Leiste an Sichtbarkeit koppeln (v0.18.0, verschaerft v0.23.0).

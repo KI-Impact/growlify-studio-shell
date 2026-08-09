@@ -6,7 +6,7 @@
 
 import { tokenVars, MODULES, FONT_HREF } from './tokens.mjs';
 
-export { TOKENS, MODULES, tokenVars, FONT_HREF, fontLink } from './tokens.mjs';
+export { TOKENS, MODULES, tokenVars, FONT_HREF, fontLink, suiteUrl, SUITE_DOMAIN } from './tokens.mjs';
 
 // Das gemeinsame CSS-Fundament: Tokens als :root + ruhiger Reset + Basistypo.
 // Studios binden das EINMAL im <head> ein, statt eigene <style>-Blöcke zu pflegen.
