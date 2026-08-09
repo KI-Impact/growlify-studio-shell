@@ -49,7 +49,7 @@ export function chromeCss() {
 .gsc-mods{display:flex;align-items:center;gap:3px;margin-left:auto;flex-wrap:wrap}
 .gsc-mod{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:500;color:${T.fg2};text-decoration:none;white-space:nowrap}
 .gsc-mod:hover{background:${T.surface2};text-decoration:none}
-.gsc-mod[aria-current=page]{background:${T.fg1};color:${T.onDark}}
+.gsc-mod[aria-current=page]{background:${T.brand};color:${T.brandInk};font-weight:600}
 .gsc-dot{width:7px;height:7px;border-radius:999px;background:${STILL};display:inline-block;flex:none}
 /* ---- Layout: Seitenleiste + Inhalt ---- */
 .gsc-shell{display:flex;min-height:calc(100vh - 46px);align-items:stretch}

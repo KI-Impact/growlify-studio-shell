@@ -32,7 +32,9 @@ tbody tr{transition:background .15s ease}
 tbody tr:hover{background:var(--surface2)}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:13px;color:var(--fg2);cursor:pointer;transition:background .15s ease,color .15s ease}
 .pill:hover{background:var(--surface2);text-decoration:none}
-.pill[aria-current=page]{background:var(--fg1);color:var(--onDark);font-weight:500}
+/* Aktiv = Mint-Pille mit dunkler Schrift (die Primaer-CTA der LP), NICHT die
+   fast-schwarze Pille von frueher. Hell-Regel: keine dunklen Flaechen als Default. */
+.pill[aria-current=page]{background:var(--brand);color:var(--brandInk);font-weight:600}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .suite-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
 .suite-brand{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--fg1)}
