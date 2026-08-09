@@ -1,25 +1,36 @@
 // tokens.mjs — die einzige Quelle der Design-Tokens für alle Studios.
-// Werte sind in DESIGN.md begründet. Studios binden NICHT eigene Hex-Werte ein,
-// sondern ziehen baseCss() aus index.mjs (das diese Tokens als :root setzt).
+// Studios binden NICHT eigene Hex-Werte ein, sondern ziehen baseCss() aus index.mjs
+// (das diese Tokens als :root setzt).
+//
+// KI-IMPACT-BRANDING (09.08.2026). Jeder Wert stammt aus der verbindlichen
+// Design-Quelle `~/Developer/ki-impact-lp/design/tokens.css`. Nichts frei erfunden;
+// in Klammern der Name des LP-Tokens, aus dem der Wert kommt.
+//
+// HELL-REGEL (Manuel, verbindlich): Das System-Branding ist HELL. Die dunklen
+// LP-Töne (--ki-dark* #10221a/#0e1a15) sind ausschliesslich Akzent (Text auf Mint,
+// vereinzelte Kopf-/Fussflaechen), NIE Flaechen-Default und kein Dark-Mode-Look.
 
 export const TOKENS = {
-  bg: '#FAFAF9',
-  surface: '#FFFFFF',
-  surface2: '#F2F2EC',
-  fg1: '#18221B',
-  fg2: '#5B6660',
-  fg3: '#8A938D',
-  border: '#E7E7DF',
-  brand: '#13E489',
-  brandInk: '#04342C',
-  accent: '#23B2CF',
-  onDark: '#FAFAF9',
-  ok: '#13E489',
-  warn: '#EF9F27',
-  fail: '#E24B4A',
+  bg: '#f7f9f8',        // Canvas            (--ki-bg-soft)
+  surface: '#ffffff',   // Karte / Flaeche   (--ki-bg)
+  surface2: '#f0faf4',  // Subtile Flaeche, Hover, aktive Auswahl (--ki-mint-tint)
+  fg1: '#1c2422',       // Text primaer      (--ki-text)
+  fg2: '#41544b',       // Text sekundaer    (--ki-mint-tint-text)
+  fg3: '#5b6a64',       // Text gedaempft    (--ki-text-muted)
+  border: '#e3eae6',    // Linie / Border    (--ki-border)
+  brand: '#65fbb8',     // Primaer-CTA, Marken-Flaeche (--ki-mint)
+  brandInk: '#10221a',  // Text auf brand    (--ki-dark)
+  accent: '#2c9a69',    // Links, Text-Akzente, Fokus (--ki-green)
+  onDark: '#f7f9f8',    // Text auf dunklen Akzentflaechen (--ki-bg-soft)
+  ok: '#2c9a69',        // Status ok         (--ki-green)
+  warn: '#EF9F27',      // Status warn — die LP definiert keinen Warn-Ton, daher
+                        // bewusst unveraendert aus dem Vorgaenger-Set uebernommen.
+  fail: '#b3423a',      // Status fail       (--ki-error)
 };
 
 // Als CSS-Custom-Properties (kurze Aliasse, wie in den bestehenden Studios genutzt).
+// --grad ersetzt den alten Signatur-Gradienten gruen->cyan: KI Impact hat kein Cyan,
+// der Verlauf laeuft jetzt Mint -> Gruen (beide aus der LP-Palette).
 export function tokenVars() {
   const t = TOKENS;
   return `
@@ -27,9 +38,20 @@ export function tokenVars() {
     --fg1:${t.fg1}; --fg2:${t.fg2}; --fg3:${t.fg3}; --border:${t.border};
     --brand:${t.brand}; --brandInk:${t.brandInk}; --accent:${t.accent}; --onDark:${t.onDark};
     --ok:${t.ok}; --warn:${t.warn}; --fail:${t.fail};
-    --radius:10px; --radius-sm:8px;
-    --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --grad:linear-gradient(135deg,${t.brand},${t.accent});
+    --radius:14px; --radius-sm:10px;
+    --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-head:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;
     --font-mono:'Spline Sans Mono',ui-monospace,'SF Mono',Menlo,monospace;`;
+}
+
+// Der Google-Fonts-Link der Suite. Studios, die eine eigene Seite ausserhalb von
+// baseCss() bauen (Login, Leerseiten, generierte Cockpits), binden diesen String ein,
+// statt eine eigene Font-URL zu pflegen. Sora = Headlines, Figtree = Text (LP-Vorgabe).
+export const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Figtree:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap';
+
+export function fontLink() {
+  return `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="${FONT_HREF}">`;
 }
 
 // Die sechs Module der Suite in fester Reihenfolge. Brain ist das Herz (erste Position).

@@ -4,27 +4,27 @@
 // Stand 0.1.0: Tokens + baseCss sind final (Design-Spec freigegeben-fähig).
 // suiteTopbar() / systemSection() folgen nach Freigabe der visuellen Richtung (siehe DESIGN.md §5).
 
-import { tokenVars, MODULES } from './tokens.mjs';
+import { tokenVars, MODULES, FONT_HREF } from './tokens.mjs';
 
-export { TOKENS, MODULES } from './tokens.mjs';
+export { TOKENS, MODULES, tokenVars, FONT_HREF, fontLink } from './tokens.mjs';
 
 // Das gemeinsame CSS-Fundament: Tokens als :root + ruhiger Reset + Basistypo.
 // Studios binden das EINMAL im <head> ein, statt eigene <style>-Blöcke zu pflegen.
 export function baseCss() {
-  return `@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap');
+  return `@import url('${FONT_HREF}');
 :root{${tokenVars()}}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--fg1);font-family:var(--font);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
-h1,h2,h3{font-weight:600;letter-spacing:-0.02em;line-height:1.15;margin:0 0 .4em}
+h1,h2,h3{font-family:var(--font-head);font-weight:600;letter-spacing:-0.02em;line-height:1.15;margin:0 0 .4em}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
 .muted{color:var(--fg2)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 .dot{width:8px;height:8px;border-radius:999px;display:inline-block}
-.dot-ok{background:var(--ok)} .dot-warn{background:var(--warn)} .dot-fail{background:var(--fail)} .dot-still{background:#C7C9C2}
+.dot-ok{background:var(--ok)} .dot-warn{background:var(--warn)} .dot-fail{background:var(--fail)} .dot-still{background:#cdd9d3}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th{text-align:left;font-weight:500;color:var(--fg2);background:var(--surface2);padding:9px 12px}
 td{padding:9px 12px;border-top:1px solid var(--border)}

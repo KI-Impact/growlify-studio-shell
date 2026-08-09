@@ -11,6 +11,8 @@
 // Trägt ab Tag 1 {uid,tenant,role} → Stufe 2 (Marcus/Rollen) und Stufe 3 (Mandanten) ohne Auth-Umbau.
 
 import crypto from 'node:crypto';
+import { FONT_HREF } from './tokens.mjs';
+import { wordmarkSvg } from './logo.mjs';
 
 const COOKIE = 'gf_session';
 const b64u = (buf) => Buffer.from(buf).toString('base64url');
@@ -80,23 +82,25 @@ export function verifyPassword(pw, stored) {
   } catch { return false; }
 }
 
-export function loginPage({ title = 'Growlify Suite', next = '', error = false, action = '/login', withEmail = false } = {}) {
+export function loginPage({ title = 'KI Impact Business Studio', next = '', error = false, action = '/login', withEmail = false } = {}) {
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Anmelden · ${title}</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_HREF}" rel="stylesheet">
 <style>
-*{box-sizing:border-box} body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAFAF9;color:#18221B;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f9f8;color:#1c2422;font-family:'Figtree',system-ui,sans-serif}
 .card{background:#fff;border:1px solid rgba(24,34,27,.07);border-radius:20px;box-shadow:0 1px 3px rgba(24,34,27,.05),0 18px 44px rgba(24,34,27,.06);padding:34px 32px;width:min(380px,92vw)}
-.wm{font-size:26px;font-weight:700;letter-spacing:-.02em;background:linear-gradient(135deg,#13E489,#23B2CF);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{font-size:13px;color:#6C756D;margin:2px 0 22px}
+h1,h2,h3{font-family:'Sora',sans-serif}
+.wm{display:block}
+.sub{font-family:'Sora',sans-serif;font-size:13px;color:#6C756D;margin:10px 0 22px}
 label{display:block;font-size:12.5px;font-weight:600;color:#3C463E;margin:0 0 6px}
-input{width:100%;font:inherit;font-size:15px;padding:11px 13px;border:1px solid rgba(24,34,27,.12);border-radius:12px;background:#FAFAF9}
-input:focus{outline:none;border-color:#23B2CF;background:#fff}
-button{width:100%;margin-top:16px;background:linear-gradient(135deg,#13E489,#23B2CF);color:#fff;border:0;border-radius:12px;padding:12px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+input{width:100%;font:inherit;font-size:15px;padding:11px 13px;border:1px solid #e3eae6;border-radius:12px;background:#f7f9f8}
+input:focus{outline:none;border-color:#2c9a69;background:#fff}
+button{width:100%;margin-top:16px;background:#65fbb8;color:#10221a;border:0;border-radius:12px;padding:12px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+button:hover{background:#4ef0aa}
 .err{font-size:12.5px;color:#B4231F;margin-top:10px;min-height:1em}
 </style></head><body>
 <form class="card" method="post" action="${action}">
-  <div class="wm">growlify</div><div class="sub">Suite-Anmeldung</div>
+  <div class="wm">${wordmarkSvg(30)}</div><div class="sub">Business Studio Anmeldung</div>
   <input type="hidden" name="next" value="${String(next).replace(/"/g, '&quot;')}">
   ${withEmail ? `<label for="em">E-Mail</label>
   <input id="em" name="email" type="email" autocomplete="username" autofocus style="margin-bottom:14px">` : ''}

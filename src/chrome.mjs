@@ -13,7 +13,7 @@ import { wordmarkSvg } from './logo.mjs';
 
 const T = TOKENS;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const FONT = "'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif";
+const FONT = "'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif";
 const STILL = '#C7C9C2';
 const GRAD = `linear-gradient(135deg,${T.brand},${T.accent})`;
 
@@ -44,7 +44,7 @@ export function chromeCss() {
 .gsc-burger{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;border:1px solid ${T.border};background:${T.surface2};cursor:pointer;color:${T.fg1};padding:0}
 .gsc-brand{display:flex;align-items:baseline;gap:8px;text-decoration:none}
 .gsc-wm{display:inline-flex;align-items:center;height:20px;line-height:0}
-.gsc-wm-svg{display:block;height:100%;width:auto}
+.gsc-wm-img{display:block;height:100%;width:auto}
 .gsc-tag{font-size:10.5px;color:${T.fg2};border:1px solid ${T.border};border-radius:999px;padding:1px 8px}
 .gsc-mods{display:flex;align-items:center;gap:3px;margin-left:auto;flex-wrap:wrap}
 .gsc-mod{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:500;color:${T.fg2};text-decoration:none;white-space:nowrap}
@@ -62,7 +62,7 @@ export function chromeCss() {
 .gsc-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;font-size:13.5px;font-weight:500;color:${T.fg2};text-decoration:none;cursor:pointer;border:0;background:none;font-family:inherit;text-align:left;width:100%}
 .gsc-item svg{opacity:.8}
 .gsc-item:hover{background:${T.surface2};text-decoration:none;color:${T.fg1}}
-.gsc-item.on{color:#0B6B43;background:linear-gradient(135deg,rgba(19,228,137,.15),rgba(35,178,207,.13));font-weight:600}
+.gsc-item.on{color:#1f7a52;background:linear-gradient(135deg,rgba(101,251,184,.28),rgba(44,154,105,.14));font-weight:600}
 .gsc-item.on svg{opacity:1}
 .gsc-side-foot{margin-top:auto;padding-top:12px;border-top:1px solid ${T.border};display:flex;flex-direction:column;gap:2px}
 .gsc-account{padding-top:10px;margin-top:10px;border-top:1px solid ${T.border};display:flex;flex-direction:column;gap:3px}
@@ -127,7 +127,7 @@ export function suiteChrome({
 
   const topbar = `<div class="gsc-top"><div class="gsc-top-in">
     <button type="button" class="gsc-burger" aria-label="Menü" onclick="document.querySelector('.gsc-side').classList.toggle('open');document.querySelector('.gsc-backdrop').classList.toggle('open')">${ic('grid', 17)}</button>
-    <a class="gsc-brand" href="${esc(home)}"><span class="gsc-wm">${wordmarkSvg(20)}</span><span class="gsc-tag">Suite</span></a>
+    <a class="gsc-brand" href="${esc(home)}"><span class="gsc-wm">${wordmarkSvg(20)}</span><span class="gsc-tag">Business Studio</span></a>
     <nav class="gsc-mods" aria-label="Module">${modules.map(pill).join('')}</nav>
   </div></div>`;
 
@@ -138,7 +138,7 @@ export function suiteChrome({
     <nav class="gsc-nav" aria-label="${esc(studio)}">${nav.map(navItem).join('')}</nav>
     ${footerNav.length ? `<div class="gsc-side-foot">${footerNav.map(navItem).join('')}</div>` : ''}
     ${account ? `<div class="gsc-account">${account.email ? `<div class="gsc-account-mail" title="${esc(account.email)}">${esc(account.email)}</div>` : ''}<a class="gsc-item" href="${esc(account.logoutHref || '/login/logout')}" target="_top">${ic('logout')}<span>Abmelden</span></a></div>` : ''}
-    <div class="gsc-side-mods"><span class="gsc-lbl">Growlify Suite</span>${modules.map(sideMod).join('')}</div>
+    <div class="gsc-side-mods"><span class="gsc-lbl">KI Impact</span>${modules.map(sideMod).join('')}</div>
   </aside>`;
 
   const live = statusUrl
@@ -166,14 +166,14 @@ export function jarvisOrb(url = 'https://brain.growlify.de/business/jarvis') {
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${s}" fill="${f}" class="gsc-jvs-dot" style="animation-delay:${d}s"/>`;
   }).join('');
   return `<style>
-.gsc-jvs{position:fixed;right:20px;bottom:20px;z-index:1200;width:56px;height:56px;border:none;border-radius:50%;cursor:pointer;padding:0;background:radial-gradient(circle at 34% 30%,#0B5A45 0%,${T.brandInk} 55%,#021F1A 100%);box-shadow:0 6px 24px rgba(4,52,44,.35),0 0 0 0 rgba(19,228,137,.35);animation:gsc-jvs-halo 3.2s ease-in-out infinite;transition:transform .18s ease}
+.gsc-jvs{position:fixed;right:20px;bottom:20px;z-index:1200;width:56px;height:56px;border:none;border-radius:50%;cursor:pointer;padding:0;background:radial-gradient(circle at 34% 30%,#1f7a52 0%,${T.brandInk} 55%,#0e1a15 100%);box-shadow:0 6px 24px rgba(4,52,44,.35),0 0 0 0 rgba(101,251,184,.35);animation:gsc-jvs-halo 3.2s ease-in-out infinite;transition:transform .18s ease}
 .gsc-jvs:hover{transform:scale(1.07)}
 .gsc-jvs svg{display:block;width:56px;height:56px}
 .gsc-jvs .gsc-jvs-ring{transform-origin:32px 32px;animation:gsc-jvs-spin 26s linear infinite}
 .gsc-jvs .gsc-jvs-ring2{transform-origin:32px 32px;animation:gsc-jvs-spin 17s linear infinite reverse}
 .gsc-jvs .gsc-jvs-dot{animation:gsc-jvs-pulse 2.6s ease-in-out infinite}
 .gsc-jvs .gsc-jvs-core{transform-origin:32px 32px;animation:gsc-jvs-core 2.6s ease-in-out infinite}
-@keyframes gsc-jvs-halo{0%,100%{box-shadow:0 6px 24px rgba(4,52,44,.35),0 0 0 0 rgba(19,228,137,.30)}50%{box-shadow:0 6px 24px rgba(4,52,44,.35),0 0 0 11px rgba(19,228,137,0)}}
+@keyframes gsc-jvs-halo{0%,100%{box-shadow:0 6px 24px rgba(4,52,44,.35),0 0 0 0 rgba(101,251,184,.30)}50%{box-shadow:0 6px 24px rgba(4,52,44,.35),0 0 0 11px rgba(101,251,184,0)}}
 @keyframes gsc-jvs-spin{to{transform:rotate(360deg)}}
 @keyframes gsc-jvs-pulse{0%,100%{opacity:.55}50%{opacity:1}}
 @keyframes gsc-jvs-core{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.18);opacity:1}}
@@ -189,9 +189,9 @@ export function jarvisOrb(url = 'https://brain.growlify.de/business/jarvis') {
 <button type="button" class="gsc-jvs" aria-label="Jarvis öffnen" onclick="(function(d){d.classList.toggle('open');var f=d.querySelector('iframe');if(d.classList.contains('open')&&f&&!f.src)f.src=f.getAttribute('data-src')})(document.querySelector('.gsc-jvs-drawer'))">
   <svg viewBox="0 0 64 64" aria-hidden="true">
     <circle cx="32" cy="32" r="4.6" fill="${T.brand}" class="gsc-jvs-core"/>
-    <circle cx="32" cy="32" r="10" fill="none" stroke="rgba(19,228,137,.25)" stroke-width=".7"/>
-    <circle cx="32" cy="32" r="18" fill="none" stroke="rgba(35,178,207,.22)" stroke-width=".7" stroke-dasharray="2 5"/>
-    <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(19,228,137,.18)" stroke-width=".7" stroke-dasharray="1.5 6"/>
+    <circle cx="32" cy="32" r="10" fill="none" stroke="rgba(101,251,184,.25)" stroke-width=".7"/>
+    <circle cx="32" cy="32" r="18" fill="none" stroke="rgba(44,154,105,.22)" stroke-width=".7" stroke-dasharray="2 5"/>
+    <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(101,251,184,.18)" stroke-width=".7" stroke-dasharray="1.5 6"/>
     <g class="gsc-jvs-ring">${dots}</g>
     <g class="gsc-jvs-ring2"><circle cx="50" cy="32" r="1.6" fill="${T.accent}" class="gsc-jvs-dot" style="animation-delay:.4s"/><circle cx="14" cy="32" r="1.9" fill="${T.brand}" class="gsc-jvs-dot" style="animation-delay:1.5s"/><circle cx="32" cy="12" r="1.4" fill="#B7F7DD" class="gsc-jvs-dot" style="animation-delay:.9s"/></g>
   </svg>
@@ -209,7 +209,7 @@ export function jarvisOrb(url = 'https://brain.growlify.de/business/jarvis') {
 // Für kundengerichtete Apps (Portal). topRight = optionaler HTML-String rechts in der Leiste
 // (z.B. Abmelden-Link).
 export function kundenChrome({
-  studio = 'Growlify', subtitle = '', studioHref = '/', nav = [], footerNav = [],
+  studio = 'KI Impact', subtitle = '', studioHref = '/', nav = [], footerNav = [],
   homeHref = '/', topRight = '', content = '',
 } = {}) {
   const navItem = (n) => {

@@ -2,11 +2,12 @@
 // suiteTopbar ist SELBST-ENTHALTEN (Inline-Styles), passt ohne CSS-Import in jedes Studio.
 // systemSection nutzt die baseCss-Klassen (für Studios, die das Fundament adoptieren).
 import { MODULES, TOKENS, sichtbarkeitScript } from './tokens.mjs';
+import { wordmarkSvg } from './logo.mjs';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const T = TOKENS;
-const FONT = "'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif";
+const FONT = "'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif";
 const STILL = '#C7C9C2';
 const dotBg = (s) => (s === 'ok' ? T.ok : s === 'warn' ? T.warn : s === 'fail' ? T.fail : STILL);
 
@@ -36,9 +37,8 @@ export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '
     : '';
   return `<header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:10px 16px;background:${T.surface};border-bottom:1px solid ${T.border};font-family:${FONT}">
   <a href="${esc(home)}" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-    <span style="width:22px;height:22px;border-radius:6px;background:${T.brand};color:${T.brandInk};display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">G</span>
-    <span style="font-weight:600;color:${T.fg1};font-size:15px">Growlify</span>
-    <span style="font-size:11px;color:${T.fg2};border:1px solid ${T.border};border-radius:999px;padding:1px 8px">Suite</span>
+    ${wordmarkSvg(18)}
+    <span style="font-size:11px;color:${T.fg2};border:1px solid ${T.border};border-radius:999px;padding:1px 8px">Business Studio</span>
   </a>
   <nav aria-label="Module" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${pills}</nav>
   <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:${T.fg2}">
@@ -81,7 +81,7 @@ export function suiteLauncher({ active = '', links = {}, statusUrl = '', modules
   <button type="button" aria-label="Module wechseln" onclick="var p=document.querySelector('#growlify-suite [data-suite-pop]');p.style.display=(p.style.display==='block'?'none':'block');event.stopPropagation()" style="${btn}">${GRID_SVG(T.fg1)}</button>
   <div data-suite-pop style="display:none;position:absolute;top:44px;left:0;width:284px;background:${T.surface};border:1px solid ${T.border};border-radius:12px;box-shadow:0 12px 32px rgba(24,34,27,0.13);z-index:1000">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid ${T.surface2}">
-      <span style="display:flex;align-items:center;gap:7px;font-weight:600;color:${T.fg1};font-size:13.5px"><span style="width:18px;height:18px;border-radius:5px;background:${T.brand};color:${T.brandInk};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;line-height:1">G</span>Growlify Suite</span>
+      <span style="display:flex;align-items:center;gap:7px;font-weight:600;color:${T.fg1};font-size:13.5px">${wordmarkSvg(16)}Business Studio</span>
       <span data-suite-health style="font-size:11.5px;color:${T.brandInk};background:#E1F5EE;border:1px solid #9FE1CB;border-radius:999px;padding:1px 8px">—</span>
     </div>
     <div style="padding:6px">${rows}</div>
