@@ -1,4 +1,4 @@
-# TOKENS.md — Der Farb- und Nav-Vertrag der Growlify-Suite
+# TOKENS.md — Der Farb- und Nav-Vertrag der KI-Impact-Suite
 
 Soll-Konvention für alle sechs Module (Brain, CRM, Sales, Finance, Marketing,
 Transkripte). Stand 2026-07-02. Dieses Dokument ist der **Vertrag** für die

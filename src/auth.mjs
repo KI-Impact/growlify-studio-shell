@@ -115,7 +115,7 @@ button:hover{background:#4ef0aa}
 // opts: { authSecret, cookieDomain, password, realm, title, open=[], openPrefix=[], bypass, loginPath='/login' }
 export function mountSuiteAuth(app, opts = {}) {
   const {
-    authSecret, cookieDomain, password, realm = 'growlify', title = 'Growlify Suite',
+    authSecret, cookieDomain, password, realm = 'ki-impact', title = 'KI Impact Business Studio',
     open = [], openPrefix = [], bypass, loginPath = '/login',
     validate, loginUrl,
   } = opts;

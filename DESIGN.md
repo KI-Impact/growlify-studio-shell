@@ -1,4 +1,4 @@
-# DESIGN.md — Growlify Studio Suite (Shell)
+# DESIGN.md — KI Impact Business Studio (Shell)
 
 > Source of truth fürs Design der gesamten Suite. Erst hier entscheiden, dann coden.
 > Jeder Farb-/Größenwert in den Studios muss auf ein Token hier zurückführbar sein.
@@ -54,7 +54,7 @@ Dark-Layer nur die Werte tauscht.
 ## 5. Die Suite-Anatomie (das Kernstück dieses Pakets)
 Drei feste Ebenen, in jedem Studio identisch (aus der Shell, nicht kopiert):
 
-1. **Suite-Topbar** (persistent, ~52px): links Wortmarke „Growlify" + dezenter „Suite"-Tag.
+1. **Suite-Topbar** (persistent, ~52px): links Wortmarke „KI Impact" + dezenter „Suite"-Tag.
    Mitte/links der **Modul-Switcher**: Brain · CRM · Sales · Finance · Marketing, jedes eine
    Pille mit **Live-Status-Punkt** (grün/gelb/rot aus `system_health`). Rechts ein globaler
    Gesundheits-Puls (wie viele Module grün) + Umgebungs-Tag. Das ist der „Heimweg": von überall

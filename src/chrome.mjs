@@ -1,5 +1,5 @@
 // chrome.mjs — das komplette Suite-Chrome (v0.13): EINE Komponente statt zwei konkurrierender
-// Header. Anatomie: schlanke Suite-Leiste oben (growlify-Wortmarke, Modul-Pills mit Live-Dots,
+// Header. Anatomie: schlanke Suite-Leiste oben (KI-Impact-Wortmarke, Modul-Pills mit Live-Dots,
 // Gradient-Signatur) + Studio-Seitenleiste links (Studio-Identität, Arbeitsnavigation, System
 // unten angepinnt). Mobil klappt die Seitenleiste als Drawer über den Burger in der Leiste.
 //

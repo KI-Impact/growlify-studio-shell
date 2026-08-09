@@ -17,13 +17,13 @@ const page = `<!doctype html><html lang="de"><head><meta charset="utf-8">
 <body>
 <header class="top"><div class="wrap">
   ${suiteLauncher({ active: 'finance', statusUrl })}
-  <span class="logo">growlify</span>
+  <span class="logo">KI Impact</span>
   <span class="titel">Finance Studio</span>
   <nav class="tabs"><span>Dashboard</span><span>Buchhaltung</span><span>Plan &amp; Forecast</span><span class="on">System</span></nav>
 </div></header>
 <main style="max-width:1180px;margin:0 auto;padding:28px 24px">
   <h1>Überblick</h1>
-  <p class="muted">Studio-Inhalt. Der Header ist eine Reihe: Menü-Icon, growlify-Logo, Studio-Name, Reiter.</p>
+  <p class="muted">Studio-Inhalt. Der Header ist eine Reihe: Menü-Icon, KI-Impact-Logo, Studio-Name, Reiter.</p>
 </main>
 </body></html>`;
 
