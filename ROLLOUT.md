@@ -12,12 +12,12 @@ Lokal gegen die echte DB getestet, Ergebnis: `{"brain":"warn","crm":"ok","financ
 ## Pro Studio (gleiche fünf Schritte)
 1. **Paket als Abhängigkeit** in die `package.json` des Studios:
    ```json
-   "@growlify/studio-shell": "github:denglermanuel/growlify-studio-shell#v0.3.0"
+   "@ki-impact/studio-shell": "github:denglermanuel/growlify-studio-shell#v0.3.0"
    ```
    Dann `npm install` (lokal mit Tunnel oder beim nächsten Deploy).
 2. **CSS-Fundament** statt eigenem `<style>`-Block, im `<head>`:
    ```js
-   import { baseCss, suiteTopbar, systemSection } from '@growlify/studio-shell';
+   import { baseCss, suiteTopbar, systemSection } from '@ki-impact/studio-shell';
    // <head>:  <style>${baseCss()}</style>
    ```
 3. **Eigenen Header durch die Topbar ersetzen** (oben im `<body>`):

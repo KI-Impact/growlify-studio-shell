@@ -1,6 +1,6 @@
-# @growlify/studio-shell
+# @ki-impact/studio-shell
 
-Die geteilte Suite-Shell für alle Growlify-Studios. Eine Quelle der Wahrheit für Design-Tokens,
+Die geteilte Suite-Shell für alle Studios des KI Impact Business Studio. Eine Quelle der Wahrheit für Design-Tokens,
 die Suite-Topbar (Modul-Switcher mit Live-Status), das CSS-Fundament und die einheitliche
 System-Sektion. Framework-frei: jede Funktion gibt einen HTML-String zurück, passend zur
 Server-Render-Lane der Studios (kein Next, kein Bundler).
@@ -21,12 +21,12 @@ beim Deploy):
 ```json
 // package.json des Studios
 "dependencies": {
-  "@growlify/studio-shell": "github:denglermanuel/growlify-studio-shell#v0.1.0"
+  "@ki-impact/studio-shell": "github:denglermanuel/growlify-studio-shell#v0.1.0"
 }
 ```
 
 ```js
-import { baseCss, suiteTopbar, MODULES } from '@growlify/studio-shell';
+import { baseCss, suiteTopbar, MODULES } from '@ki-impact/studio-shell';
 // im <head>:  <style>${baseCss()}</style>
 // im <body>:  ${suiteTopbar({ active: 'finance', health })}
 ```

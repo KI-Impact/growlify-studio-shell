@@ -3,7 +3,7 @@
 #
 # Hintergrund: npm löst github:-Tags im Lockfile NICHT neu auf — "npm install" ohne explizite
 # Versionsangabe lässt den alten Commit im Lock stehen. Einziger verlässlicher Weg:
-#   npm install @growlify/studio-shell@github:denglermanuel/growlify-studio-shell#vX.Y.Z
+#   npm install @ki-impact/studio-shell@github:denglermanuel/growlify-studio-shell#vX.Y.Z
 # Genau das macht dieses Skript für jedes Konsumenten-Repo: Version in package.json bumpen,
 # Lock auf den Tag-Commit neu auflösen, committen (und mit --push pushen → Coolify-Auto-Deploy).
 #
@@ -58,14 +58,14 @@ for repo in "${CONSUMERS[@]}"; do
   if [ ! -f "$dir/package.json" ]; then
     echo "   übersprungen (kein package.json)"; continue
   fi
-  if ! node -e "process.exit(require('$dir/package.json').dependencies?.['@growlify/studio-shell'] ? 0 : 1)"; then
+  if ! node -e "process.exit(require('$dir/package.json').dependencies?.['@ki-impact/studio-shell'] ? 0 : 1)"; then
     echo "   übersprungen (keine Shell-Dependency)"; continue
   fi
   (
     cd "$dir"
-    npm install --no-audit --no-fund "@growlify/studio-shell@$SPEC_BASE#$VERSION"
+    npm install --no-audit --no-fund "@ki-impact/studio-shell@$SPEC_BASE#$VERSION"
     # Nachweis: Lock zeigt auf den Tag-Commit?
-    locked=$(node -e "const s=require('./package-lock.json').packages['node_modules/@growlify/studio-shell'];console.log((s.resolved.match(/#([0-9a-f]{40})/)||[])[1]||'?')")
+    locked=$(node -e "const s=require('./package-lock.json').packages['node_modules/@ki-impact/studio-shell'];console.log((s.resolved.match(/#([0-9a-f]{40})/)||[])[1]||'?')")
     if [ "$locked" != "$TAG_COMMIT" ]; then
       echo "   FEHLER: Lock zeigt auf $locked statt $TAG_COMMIT" >&2; exit 1
     fi
