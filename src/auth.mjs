@@ -13,7 +13,7 @@
 // Trägt ab Tag 1 {uid,tenant,role} → Stufe 2 (Marcus/Rollen) und Stufe 3 (Mandanten) ohne Auth-Umbau.
 
 import crypto from 'node:crypto';
-import { FONT_HREF, SUITE_LEGACY_DOMAIN, legacyZiel } from './tokens.mjs';
+import { FONT_HREF, SUITE_LEGACY_DOMAIN, legacyZiel, withBasePath } from './tokens.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
 const COOKIE = 'gf_session';
@@ -114,11 +114,14 @@ button:hover{background:#4ef0aa}
 }
 
 // Hängt Login-Routen + Gate-Middleware an die App. Aufruf FRÜH (vor den eigentlichen Routen).
-// opts: { authSecret, cookieDomain, password, realm, title, open=[], openPrefix=[], bypass, loginPath='/login' }
+// opts: { authSecret, cookieDomain, password, realm, title, open=[], openPrefix=[], bypass, loginPath=withBasePath('/login') }
 export function mountSuiteAuth(app, opts = {}) {
   const {
     authSecret, cookieDomain, password, realm = 'ki-impact', title = 'KI Impact Business Studio',
-    open = [], openPrefix = [], bypass, loginPath = '/login',
+    open = [], openPrefix = [], bypass,
+    // SUITE_BASE_PATH-Präfix nur auf den DEFAULT anwenden — ein explizit übergebener loginPath
+    // ist Sache des Aufrufers (der ihn ggf. schon selbst prefixt hat, z.B. beim Doppel-Mount).
+    loginPath = withBasePath('/login'),
     validate, loginUrl,
   } = opts;
   // validate(email, password) → Session-Payload {uid,tenant,role,name} | null  (echte Nutzerverwaltung, im Brain)
@@ -142,14 +145,15 @@ export function mountSuiteAuth(app, opts = {}) {
   const logoutPath = loginPath + '/logout';
   // /suite/sichtbarkeit prüft sich selbst: ohne Cookie antwortet es "nichts ausblenden".
   // Es MUSS offen sein, sonst liefert die Auth-Umleitung dem fetch HTML statt JSON.
-  const openSet = new Set([...open, loginPath, logoutPath, '/suite/sichtbarkeit']);
+  const sichtbarkeitPath = withBasePath('/suite/sichtbarkeit');
+  const openSet = new Set([...open, loginPath, logoutPath, sichtbarkeitPath]);
   const isOpen = (p) => openSet.has(p) || openPrefix.some((pre) => p.startsWith(pre));
   // Zweite, engere Liste für die Alt-Domain-Weiche: das sind die Routen, die auf der ALTEN
   // Adresse weiterlaufen MÜSSEN, weil sie in verschickten Mails und bei Webhook-Anbietern
   // hinterlegt sind (Buchungsstrecke, Webhook-Endpunkte, /healthz). Login und Logout stehen
   // hier bewusst NICHT drin: die Anmeldung auf der Alt-Domain kann kein gültiges Cookie mehr
   // setzen, sie gehört umgeleitet statt bedient.
-  const istOeffentlich = (p) => open.includes(p) || p === '/suite/sichtbarkeit'
+  const istOeffentlich = (p) => open.includes(p) || p === sichtbarkeitPath
     || openPrefix.some((pre) => p.startsWith(pre));
 
   // Alt-Domain-Weiche (v0.28.0). Steht VOR den Login-Routen und vor dem Gate, damit ein Aufruf
@@ -166,7 +170,7 @@ export function mountSuiteAuth(app, opts = {}) {
   }
 
   app.get(loginPath, (req, res) => {
-    if (authSecret && verifySession(readCookie(req), authSecret)) return res.redirect(302, req.query.next || '/');
+    if (authSecret && verifySession(readCookie(req), authSecret)) return res.redirect(302, req.query.next || withBasePath('/'));
     if (loginUrl) return res.redirect(302, loginUrl + (req.query.next ? '?next=' + encodeURIComponent(req.query.next) : ''));
     // Ohne validate und ohne erlaubten Passwort-Login gäbe die Maske ein Feld aus, das nichts
     // mehr bewirkt. Dann lieber eine ehrliche Ansage als ein Formular, das immer fehlschlägt.
@@ -177,7 +181,7 @@ export function mountSuiteAuth(app, opts = {}) {
   });
   app.post(loginPath, async (req, res) => {
     const body = await readBody(req);
-    const next = body.next || req.query.next || '/';
+    const next = body.next || req.query.next || withBasePath('/');
     let payload = null;
     if (validate) {
       try { payload = await validate(body.email, body.password); } catch { payload = null; }
@@ -215,7 +219,7 @@ export function mountSuiteAuth(app, opts = {}) {
     }
     return antwort;
   };
-  app.get('/suite/sichtbarkeit', async (req, res) => {
+  app.get(sichtbarkeitPath, async (req, res) => {
     // Zwei unterschiedliche Fehlerfälle: fehlt das Session-Cookie ganz, ist der Nutzer noch
     // gar nicht angemeldet, dann bleibt es beim alten "nichts ausblenden" (alle: true).
     // Ist eine Session da, aber die Brain-Antwort kommt nicht zustande (kein brainUrl,

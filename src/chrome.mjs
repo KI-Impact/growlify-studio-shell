@@ -7,7 +7,7 @@
 // <body>-Innere zurück. Das Studio entfernt seinen eigenen Header und legt seinen Seiteninhalt
 // als content hinein. Selbst-enthalten: eigenes CSS (gsc-Präfix, Hex-Tokens, keine Abhängigkeit
 // von Studio-:root-Variablen).
-import { MODULES, TOKENS, sichtbarkeitScript, suiteUrl } from './tokens.mjs';
+import { MODULES, TOKENS, sichtbarkeitScript, suiteUrl, withBasePath } from './tokens.mjs';
 import { ICONS } from './components.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
@@ -103,7 +103,7 @@ export function suiteChrome({
   jarvis = true, jarvisUrl = suiteUrl('brain', '/business/jarvis'),
   // Same-Origin-Proxy, den mountSuiteAuth in jedem Studio mitbringt. Leerer String schaltet
   // die Kopplung ab (z.B. für Seiten ohne Suite-Session).
-  sichtbarkeitUrl = '/suite/sichtbarkeit',
+  sichtbarkeitUrl = withBasePath('/suite/sichtbarkeit'),
   // Konto-Fuß (03.08.): angemeldetes Konto + Abmelden-Link, unten in der Seitenleiste, auf JEDER
   // Seite sichtbar (Befund Manuel: es gab nirgends einen sichtbaren Abmelden-Weg). { email,
   // logoutHref } — null lässt den Block weg (z.B. Seiten ohne Suite-Session).
@@ -139,7 +139,7 @@ export function suiteChrome({
     ${studioHref ? `<a class="gsc-studio" href="${esc(studioHref)}" style="text-decoration:none;color:inherit" title="${esc(studio)} · Start">${studioHead}</a>` : `<div class="gsc-studio">${studioHead}</div>`}
     <nav class="gsc-nav" aria-label="${esc(studio)}">${nav.map(navItem).join('')}</nav>
     ${footerNav.length ? `<div class="gsc-side-foot">${footerNav.map(navItem).join('')}</div>` : ''}
-    ${account ? `<div class="gsc-account">${account.email ? `<div class="gsc-account-mail" title="${esc(account.email)}">${esc(account.email)}</div>` : ''}<a class="gsc-item" href="${esc(account.logoutHref || '/login/logout')}" target="_top">${ic('logout')}<span>Abmelden</span></a></div>` : ''}
+    ${account ? `<div class="gsc-account">${account.email ? `<div class="gsc-account-mail" title="${esc(account.email)}">${esc(account.email)}</div>` : ''}<a class="gsc-item" href="${esc(account.logoutHref || withBasePath('/login/logout'))}" target="_top">${ic('logout')}<span>Abmelden</span></a></div>` : ''}
     <div class="gsc-side-mods"><span class="gsc-lbl">KI Impact</span>${modules.map(sideMod).join('')}</div>
   </aside>`;
 
