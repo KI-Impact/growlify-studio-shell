@@ -256,7 +256,15 @@ export function mountSuiteAuth(app, opts = {}) {
       const sess = verifySession(readCookie(req), authSecret);
       if (sess) { req.suiteUser = sess; return next(); }
       const target = loginUrl || loginPath; // externe Login-URL (Brain) oder lokale Maske
-      if (req.method === 'GET') return res.redirect(302, target + '?next=' + encodeURIComponent(loginUrl ? (req.protocol + '://' + req.get('host') + req.originalUrl) : req.originalUrl));
+      if (req.method === 'GET') {
+        // req.originalUrl (nicht req.url/req.path!) enthält bei einem gemounteten Teilpfad
+        // (root.use('/marketing', app)) das Präfix mit — req.url/req.path wären relativ zum
+        // Mount-Punkt und würden es verschlucken. Das Protokoll kommt hinter Traefik nicht aus
+        // req.protocol (der Server selbst sieht nur http), sondern aus x-forwarded-proto.
+        const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim();
+        const absoluteZiel = proto + '://' + req.get('host') + req.originalUrl;
+        return res.redirect(302, target + '?next=' + encodeURIComponent(absoluteZiel));
+      }
       return res.status(401).end('Anmeldung erforderlich');
     }
     if (password) { // Fallback: bisheriges Basic-Auth (exakt wie zuvor)
