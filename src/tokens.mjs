@@ -132,6 +132,21 @@ export function withBasePath(pfad = '/') {
   return SUITE_BASE_PATH + pfad;
 }
 
+// Pfad-Präfix aus dem Reverse-Proxy (vNext, Suite-Domain studio.ki-impact.de). Traefik routet
+// dort per Host+PathPrefix(/marketing) MIT StripPrefix auf das Studio: die App sieht Pfade
+// OHNE das Präfix, bekommt es aber im Header X-Forwarded-Prefix mitgeteilt. Anders als
+// SUITE_BASE_PATH (statisch aus einer Env, gilt für den ganzen Prozess) ist das hier PRO
+// REQUEST — dieselbe App bedient unter studio.ki-impact.de/marketing UND (ohne Header) unter
+// marketing.growlify.de gleichzeitig. Jede vom Server erzeugte absolute Redirect-/Link-Adresse
+// muss dieses Präfix VOR den Pfad setzen, sonst zeigt sie hinter dem StripPrefix ins Leere
+// (Browser interpretiert einen führenden "/" als Pfad ab Domain-Wurzel, nicht ab dem Präfix).
+// Ohne Header (Default) ein No-op — bestehende Domains bleiben byte-identisch.
+export function requestPrefix(req) {
+  const raw = String((req && req.headers && req.headers['x-forwarded-prefix']) || '').trim();
+  if (!raw || raw === '/') return '';
+  return '/' + raw.replace(/^\/+|\/+$/g, '');
+}
+
 // Die Module der Suite in fester Reihenfolge. Brain ist das Herz (erste Position).
 export const MODULES = [
   { key: 'brain',       label: 'Brain',       href: suiteUrl('brain', '/business'), heart: true },

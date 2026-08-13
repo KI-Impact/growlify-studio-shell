@@ -13,7 +13,7 @@
 // Trägt ab Tag 1 {uid,tenant,role} → Stufe 2 (Marcus/Rollen) und Stufe 3 (Mandanten) ohne Auth-Umbau.
 
 import crypto from 'node:crypto';
-import { FONT_HREF, SUITE_LEGACY_DOMAIN, legacyZiel, withBasePath } from './tokens.mjs';
+import { FONT_HREF, SUITE_LEGACY_DOMAIN, legacyZiel, requestPrefix, withBasePath } from './tokens.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
 const COOKIE = 'gf_session';
@@ -143,6 +143,11 @@ export function mountSuiteAuth(app, opts = {}) {
     console.warn('[suite-auth] AUTH_SECRET gesetzt, aber weder validate noch loginUrl: niemand kann sich anmelden.');
   }
   const logoutPath = loginPath + '/logout';
+  // Alle vom Server erzeugten Redirect-Ziele, die aus einem relativen (führt-mit-"/") Pfad
+  // gebaut werden, brauchen VOR sich das Präfix aus X-Forwarded-Prefix (requestPrefix) —
+  // sonst zeigt ein 302 hinter StripPrefix ins Leere. Externe URLs (loginUrl/brainUrl) sind
+  // davon nicht betroffen, die tragen ihre Domain bereits selbst.
+  const mitPrefix = (req, pfad) => requestPrefix(req) + pfad;
   // /suite/sichtbarkeit prüft sich selbst: ohne Cookie antwortet es "nichts ausblenden".
   // Es MUSS offen sein, sonst liefert die Auth-Umleitung dem fetch HTML statt JSON.
   const sichtbarkeitPath = withBasePath('/suite/sichtbarkeit');
@@ -170,7 +175,7 @@ export function mountSuiteAuth(app, opts = {}) {
   }
 
   app.get(loginPath, (req, res) => {
-    if (authSecret && verifySession(readCookie(req), authSecret)) return res.redirect(302, req.query.next || withBasePath('/'));
+    if (authSecret && verifySession(readCookie(req), authSecret)) return res.redirect(302, req.query.next || mitPrefix(req, withBasePath('/')));
     if (loginUrl) return res.redirect(302, loginUrl + (req.query.next ? '?next=' + encodeURIComponent(req.query.next) : ''));
     // Ohne validate und ohne erlaubten Passwort-Login gäbe die Maske ein Feld aus, das nichts
     // mehr bewirkt. Dann lieber eine ehrliche Ansage als ein Formular, das immer fehlschlägt.
@@ -181,7 +186,7 @@ export function mountSuiteAuth(app, opts = {}) {
   });
   app.post(loginPath, async (req, res) => {
     const body = await readBody(req);
-    const next = body.next || req.query.next || withBasePath('/');
+    const next = body.next || req.query.next || mitPrefix(req, withBasePath('/'));
     let payload = null;
     if (validate) {
       try { payload = await validate(body.email, body.password); } catch { payload = null; }
@@ -193,7 +198,7 @@ export function mountSuiteAuth(app, opts = {}) {
       res.set('Set-Cookie', cookieHeader(token, { domain: cookieDomain }));
       return res.redirect(302, next);
     }
-    res.redirect(302, `${loginPath}?e=1${next ? '&next=' + encodeURIComponent(next) : ''}`);
+    res.redirect(302, `${mitPrefix(req, loginPath)}?e=1${next ? '&next=' + encodeURIComponent(next) : ''}`);
   });
   // Same-Origin-Proxy für die Modul-Sichtbarkeit (v0.18.0).
   //
@@ -244,7 +249,7 @@ export function mountSuiteAuth(app, opts = {}) {
     } catch (err) { return res.json(warnUndRestriktiv(err && err.message, restriktiv)); }
   });
 
-  const doLogout = (req, res) => { res.set('Set-Cookie', cookieHeader('', { domain: cookieDomain, clear: true })); res.redirect(302, loginPath); };
+  const doLogout = (req, res) => { res.set('Set-Cookie', cookieHeader('', { domain: cookieDomain, clear: true })); res.redirect(302, mitPrefix(req, loginPath)); };
   app.get(logoutPath, doLogout);
   app.post(logoutPath, doLogout);
 
@@ -255,14 +260,18 @@ export function mountSuiteAuth(app, opts = {}) {
     if (authSecret) { // Suite-Session-Modus
       const sess = verifySession(readCookie(req), authSecret);
       if (sess) { req.suiteUser = sess; return next(); }
-      const target = loginUrl || loginPath; // externe Login-URL (Brain) oder lokale Maske
+      const target = loginUrl || mitPrefix(req, loginPath); // externe Login-URL (Brain) oder lokale Maske
       if (req.method === 'GET') {
-        // req.originalUrl (nicht req.url/req.path!) enthält bei einem gemounteten Teilpfad
-        // (root.use('/marketing', app)) das Präfix mit — req.url/req.path wären relativ zum
-        // Mount-Punkt und würden es verschlucken. Das Protokoll kommt hinter Traefik nicht aus
-        // req.protocol (der Server selbst sieht nur http), sondern aus x-forwarded-proto.
+        // req.originalUrl enthält bei einem gemounteten Teilpfad (root.use('/marketing', app))
+        // das Präfix bereits mit — req.url/req.path wären relativ zum Mount-Punkt und würden es
+        // verschlucken. Bei StripPrefix am Reverse-Proxy (Traefik, Suite-Domain
+        // studio.ki-impact.de) sieht der Server das Präfix dagegen GAR NICHT mehr in
+        // req.originalUrl, sondern nur im Header X-Forwarded-Prefix — deshalb zusätzlich davor
+        // gesetzt (requestPrefix ist bei den anderen Mustern ein No-op). Das Protokoll kommt
+        // hinter Traefik nicht aus req.protocol (der Server selbst sieht nur http), sondern aus
+        // x-forwarded-proto.
         const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim();
-        const absoluteZiel = proto + '://' + req.get('host') + req.originalUrl;
+        const absoluteZiel = proto + '://' + req.get('host') + mitPrefix(req, req.originalUrl);
         return res.redirect(302, target + '?next=' + encodeURIComponent(absoluteZiel));
       }
       return res.status(401).end('Anmeldung erforderlich');
