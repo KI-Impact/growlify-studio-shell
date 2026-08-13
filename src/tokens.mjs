@@ -111,6 +111,27 @@ export function legacyZiel(host, pfad = '/') {
   return `https://${SUBS[key] || key}.${SUITE_DOMAIN}${pfad}`;
 }
 
+// Pfad-Präfix (vNext): ein Studio zusätzlich zur Wurzel unter einem Pfad derselben
+// Suite-Domain betreiben (z.B. https://studio.ki-impact.de/marketing statt einer eigenen
+// Subdomain). Default leer = heutiges Verhalten byte-identisch. Für Reverse-Proxy-Setups
+// OHNE Pfad-Stripping (der Server sieht den vollen Pfad inkl. Präfix) registriert die Shell
+// ihre eigenen Routen und selbst erzeugten Redirects/Links/Cookie-Pfade damit unter dem
+// Präfix. Ein Studio, das stattdessen per Express doppelt mountet (root.use(prefix, app)
+// UND root.use('/', app)), lässt SUITE_BASE_PATH unverändert leer und nutzt req.baseUrl für
+// eigene Links (siehe README) — beide Muster sind gültig, siehe README.
+const rawSuiteBasePath = (process.env.SUITE_BASE_PATH || '').trim();
+export const SUITE_BASE_PATH = rawSuiteBasePath && rawSuiteBasePath !== '/'
+  ? '/' + rawSuiteBasePath.replace(/^\/+|\/+$/g, '')
+  : '';
+
+// Hängt SUITE_BASE_PATH vor einen absoluten Pfad. Ohne Präfix ein No-op, damit jede
+// bestehende Aufrufstelle ohne SUITE_BASE_PATH byte-identisch bleibt.
+export function withBasePath(pfad = '/') {
+  if (!SUITE_BASE_PATH) return pfad;
+  if (!pfad || pfad === '/') return SUITE_BASE_PATH;
+  return SUITE_BASE_PATH + pfad;
+}
+
 // Die Module der Suite in fester Reihenfolge. Brain ist das Herz (erste Position).
 export const MODULES = [
   { key: 'brain',       label: 'Brain',       href: suiteUrl('brain', '/business'), heart: true },

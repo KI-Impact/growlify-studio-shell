@@ -1,7 +1,7 @@
 // shell.mjs — die sichtbaren Suite-Komponenten. Framework-frei, geben HTML-Strings zurück.
 // suiteTopbar ist SELBST-ENTHALTEN (Inline-Styles), passt ohne CSS-Import in jedes Studio.
 // systemSection nutzt die baseCss-Klassen (für Studios, die das Fundament adoptieren).
-import { MODULES, TOKENS, sichtbarkeitScript } from './tokens.mjs';
+import { MODULES, TOKENS, sichtbarkeitScript, withBasePath } from './tokens.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -20,7 +20,7 @@ const dotBg = (s) => (s === 'ok' ? T.ok : s === 'warn' ? T.warn : s === 'fail' ?
 //   homeHref : Ziel der Wortmarke. Default: die Brain-Übersicht.
 // sichtbarkeitUrl: Same-Origin-Proxy aus mountSuiteAuth. Auch die Drop-in-Komponenten hängen
 // das Filter-Skript selbst an, damit die Kopplung auch ohne suiteChrome greift.
-export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '', statusUrl = '', modules = MODULES, sichtbarkeitUrl = '/suite/sichtbarkeit' } = {}) {
+export function suiteTopbar({ active = '', health = {}, links = {}, homeHref = '', statusUrl = '', modules = MODULES, sichtbarkeitUrl = withBasePath('/suite/sichtbarkeit') } = {}) {
   const home = homeHref || (modules.find((m) => m.key === 'brain') || {}).href || '/';
   const dot = (key, st) => `<span data-mod="${esc(key)}" style="width:7px;height:7px;border-radius:999px;background:${dotBg(st)};display:inline-block"></span>`;
   const pills = modules.map((m) => {
@@ -63,7 +63,7 @@ const MOD_ICON = {
 // öffnet. Selbst-enthalten, dependency-frei, kugelsicher gegen globale Studio-Styles (alle Werte
 // inline, Icons mit hartem Stroke). Drop-in: das ganze Stück an den Anfang des bestehenden Headers.
 //   active : key des aktuellen Moduls   statusUrl: same-origin-Proxy für Live-Dots (kein Mixed-Content)
-export function suiteLauncher({ active = '', links = {}, statusUrl = '', modules = MODULES, sichtbarkeitUrl = '/suite/sichtbarkeit' } = {}) {
+export function suiteLauncher({ active = '', links = {}, statusUrl = '', modules = MODULES, sichtbarkeitUrl = withBasePath('/suite/sichtbarkeit') } = {}) {
   const rows = modules.map((m) => {
     const cur = m.key === active;
     const href = links[m.key] || m.href;

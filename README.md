@@ -38,6 +38,39 @@ import { baseCss, suiteTopbar, MODULES } from '@ki-impact/studio-shell';
 
 So bekommt jedes Studio Shell-Updates bewusst, nicht versehentlich.
 
+## Pfad-Präfix statt eigener Subdomain (SUITE_BASE_PATH)
+
+Ein Studio kann statt einer eigenen Subdomain unter einem Pfad derselben Suite-Domain laufen,
+z.B. `https://studio.ki-impact.de/marketing`. Ohne `SUITE_BASE_PATH` bleibt alles exakt beim
+heutigen Verhalten (leerer Default = No-op). Zwei gültige Muster, je nach Deploy-Setup:
+
+**A) Reverse-Proxy leitet den vollen Pfad ohne Stripping weiter** (Traefik/Coolify ohne
+Prefix-Strip): einfach `SUITE_BASE_PATH=/marketing` setzen. `mountSuiteAuth` registriert seine
+eigenen Routen (Login, Logout, `/suite/sichtbarkeit`) dann automatisch unter dem Präfix, und alle
+selbst erzeugten Redirects/Cookie-Ziele tragen es ebenfalls.
+
+**B) Das Studio will gleichzeitig unter `/` UND unter dem Präfix erreichbar sein** (z.B. während
+einer Migration): `SUITE_BASE_PATH` leer lassen (Express-Routen bleiben relativ) und die
+Express-App doppelt mounten:
+
+```js
+import express from 'express';
+import studio from './studio-app.mjs'; // die eigentliche Studio-App, mountSuiteAuth etc.
+
+const root = express();
+root.use('/marketing', studio); // Präfix-Zugang
+root.use('/', studio);          // weiterhin die bisherige Subdomain/Wurzel
+root.listen(PORT);
+```
+
+Für eigene Links innerhalb des Studios (nicht die von der Shell selbst erzeugten) `req.baseUrl`
+verwenden statt fest `/marketing` zu verdrahten — das ist unter beiden Mounts automatisch korrekt
+(leer bei Root-Zugriff, `/marketing` bei Präfix-Zugriff):
+
+```js
+app.get('/etwas', (req, res) => res.redirect(req.baseUrl + '/anderswo'));
+```
+
 ## API (Stand 0.1.0)
 - `baseCss()` — Tokens als `:root` + ruhiger Reset + Basistypo. **final.**
 - `TOKENS`, `MODULES` — die Roh-Tokens und die fünf Suite-Module. **final.**
