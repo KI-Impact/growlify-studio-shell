@@ -221,7 +221,13 @@ export const MODULES = [
 // vollständig, ein dort fehlendes Modul gilt als nicht sichtbar und wird ausgeblendet
 // (deckt u.a. neue Module ab, die der Server noch nicht kennt). Ohne streng bleibt das
 // alte Verhalten: nur explizit false ausblenden.
-export function sichtbarkeitScript(url, active) {
-  if (!url) return '';
-  return `<script>(function(){fetch(${JSON.stringify(url)},{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){if(!d||d.alle)return;var a=${JSON.stringify(active)};document.querySelectorAll('[data-modlink]').forEach(function(e){var k=e.getAttribute('data-modlink');if(k==='brain'||k===a)return;var m=d.module||{};if(m[k]===false||(d.streng===true&&!(k in m)))e.style.display='none'})}).catch(function(){})})();</script>`;
+// ABGESCHALTET (v0.31.1, Marcus 14.08.): Die Kopplung machte die Leiste je Studio
+// unterschiedlich — restriktiver Fehlerfall (nur eigenes Studio + Brain) neben offenem
+// Fehlerfall (alle Punkte), Buildzeit-eingefrorene Endpunkt-URLs bei den statischen Studios
+// und fehlende MODUL_RESSORT-Einträge (Transkripte) fielen je App anders aus. Entscheid:
+// Die Navigation ist überall KONSTANT, nur der aktive Punkt ist markiert. Der
+// /suite/sichtbarkeit-Endpunkt bleibt bestehen (Datenquelle unangetastet); soll die
+// Kopplung je zurückkommen, hier das Skript wieder einsetzen (Git-Historie v0.31.0).
+export function sichtbarkeitScript(_url, _active) {
+  return '';
 }
