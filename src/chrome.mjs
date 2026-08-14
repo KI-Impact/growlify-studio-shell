@@ -7,7 +7,7 @@
 // <body>-Innere zurück. Das Studio entfernt seinen eigenen Header und legt seinen Seiteninhalt
 // als content hinein. Selbst-enthalten: eigenes CSS (gsc-Präfix, Hex-Tokens, keine Abhängigkeit
 // von Studio-:root-Variablen).
-import { MODULES, TOKENS, sichtbarkeitScript, suiteUrl, withBasePath } from './tokens.mjs';
+import { MODULES, TOKENS, modulHref, sichtbarkeitScript, withBasePath } from './tokens.mjs';
 import { ICONS } from './components.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
@@ -100,7 +100,7 @@ export function chromeCss() {
 export function suiteChrome({
   active = '', studio = '', subtitle = '', studioHref = '', nav = [], footerNav = [],
   statusUrl = '', homeHref = '', links = {}, modules = MODULES, content = '',
-  jarvis = true, jarvisUrl = suiteUrl('brain', '/business/jarvis'),
+  jarvis = true, jarvisUrl = modulHref('brain', '/jarvis'),
   // Same-Origin-Proxy, den mountSuiteAuth in jedem Studio mitbringt. Leerer String schaltet
   // die Kopplung ab (z.B. für Seiten ohne Suite-Session).
   sichtbarkeitUrl = withBasePath('/suite/sichtbarkeit'),
@@ -156,7 +156,7 @@ export function suiteChrome({
 // allow="microphone" ist Pflicht, seit Jarvis ein Mikrofon hat: Ohne diese Delegation lehnt der
 // Browser getUserMedia im iframe SOFORT ab und fragt den Nutzer gar nicht erst. Das sieht dann
 // aus, als hätte er die Freigabe verweigert, obwohl er nie gefragt wurde (31.07.2026 gemessen).
-export function jarvisOrb(url = suiteUrl('brain', '/business/jarvis')) {
+export function jarvisOrb(url = modulHref('brain', '/jarvis')) {
   const dots = [
     // [Ring-Radius, Winkel°, Punktgröße, Farbe, Pulsverzögerung s] — bewusst unregelmäßig, „Datenfluss".
     [26, 10, 2.4, T.brand, 0], [26, 95, 1.7, T.accent, 0.7], [26, 150, 2.1, T.brand, 1.4], [26, 215, 1.5, '#8FF3C8', 0.3], [26, 300, 2.2, T.accent, 1.9],

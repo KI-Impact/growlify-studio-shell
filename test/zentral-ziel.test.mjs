@@ -46,6 +46,23 @@ test('Zentral-Host, localhost und Fremd-Hosts: kein Redirect', () => {
   assert.equal(ziel(ENV, 'beispiel.de', '/crm'), null);
 });
 
+test('SUITE_BASE_PATH wird NICHT vor fremde Modul-Pfade gehängt (Brain-Link auf Alt-Marketing)', () => {
+  assert.equal(
+    ziel({ ...ENV, SUITE_BASE_PATH: '/marketing' }, 'marketing.growlify.de', '/business/jarvis'),
+    'https://studio.ki-impact.de/business/jarvis',
+  );
+});
+
+test('Modul-Links sind kanonische Pfade (v0.31.0)', () => {
+  const out = execFileSync(process.execPath, [
+    '--input-type=module', '-e',
+    `import('${tokens}').then((m) => console.log(JSON.stringify([m.modulHref('brain', '/jarvis'), m.MODULES.map((x) => x.key + '=' + x.href).join(' ')])));`,
+  ], { env: { ...process.env, SUITE_ZENTRAL_URL: '', SUITE_BASE_PATH: '' } });
+  const [jarvis, alle] = JSON.parse(out.toString().trim());
+  assert.equal(jarvis, '/business/jarvis');
+  assert.equal(alle, 'brain=/business eingang=/eingang crm=/crm sales=/sales marketing=/marketing/content/studio/ finance=/finance/studio/ prozesse=/prozess transkripte=/transkripte');
+});
+
 test('Ohne SUITE_ZENTRAL_URL ein No-op', () => {
   assert.equal(ziel({ ...ENV, SUITE_ZENTRAL_URL: '' }, 'crm.growlify.de', '/crm'), null);
 });

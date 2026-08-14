@@ -148,7 +148,14 @@ export function zentralZiel(host, pfad = '/') {
   const istAlt = [SUITE_DOMAIN, SUITE_LEGACY_DOMAIN].filter(Boolean)
     .some((d) => h.endsWith('.' + d.toLowerCase()));
   if (!istAlt) return null;
-  return SUITE_ZENTRAL_URL + SUITE_BASE_PATH + pfad;
+  // SUITE_BASE_PATH (Marketing: /marketing bei internem BASE /content) gehört nur vor
+  // app-eigene Pfade. Zeigt der Pfad schon auf ein Suite-Modul (z.B. Brain-Link /business
+  // aus der Topbar, angeklickt auf der Alt-Domain), darf nichts davor — sonst entstünde
+  // /marketing/business.
+  const seg = String(pfad).split('/')[1] || '';
+  const istModulPfad = Object.values(MODUL_PFADE).some((p) => p.split('/')[1] === seg);
+  const prefix = SUITE_BASE_PATH && !istModulPfad ? SUITE_BASE_PATH : '';
+  return SUITE_ZENTRAL_URL + prefix + pfad;
 }
 
 // Pfad-Präfix aus dem Reverse-Proxy (vNext, Suite-Domain studio.ki-impact.de). Traefik routet
@@ -167,14 +174,38 @@ export function requestPrefix(req) {
 }
 
 // Die Module der Suite in fester Reihenfolge. Brain ist das Herz (erste Position).
+//
+// Seit v0.31.0 sind alle Modul-Links KANONISCHE PFADE der zentralen Suite-Domain, keine
+// suiteUrl()-Subdomains mehr. Grund (Befund Manuel/Marcus, 14.08.): die Subdomain-Form war
+// die eine Quelle, aus der Topbar, Logo-Link und Jarvis-Orb in JEDEM Studio falsche
+// Cross-Links erbten — und in gebackenem HTML (Finance/Marketing-Builds) froren die URLs
+// des Build-Zeitpunkts ein. Pfade sind env-unabhängig: auf studio.ki-impact.de same-origin
+// und cookie-sicher, auf Alt-Hosts fängt die zentralZiel-301-Weiche sie ab.
+export const MODUL_PFADE = {
+  brain: '/business',
+  eingang: '/eingang',
+  crm: '/crm',
+  sales: '/sales',
+  marketing: '/marketing/content/studio/',
+  finance: '/finance/studio/',
+  prozesse: '/prozess',
+  transkripte: '/transkripte',
+};
+// Kanonischer Link eines Moduls; pfad wird angehängt (modulHref('brain','/jarvis') → /business/jarvis).
+export function modulHref(key, pfad = '') {
+  const wurzel = MODUL_PFADE[key] || '/' + key;
+  if (!pfad) return wurzel;
+  return wurzel.replace(/\/+$/, '') + pfad;
+}
 export const MODULES = [
-  { key: 'brain',       label: 'Brain',       href: suiteUrl('brain', '/business'), heart: true },
-  { key: 'eingang',     label: 'Eingang',     href: suiteUrl('eingang', '/eingang') },
-  { key: 'crm',         label: 'CRM',         href: suiteUrl('crm', '/crm') },
-  { key: 'sales',       label: 'Sales',       href: suiteUrl('sales', '/sales') },
-  { key: 'marketing',   label: 'Marketing',   href: suiteUrl('marketing', '/content/studio/') },
-  { key: 'finance',     label: 'Finance',     href: suiteUrl('finance', '/finance/studio/') },
-  { key: 'prozesse',    label: 'Prozesse',    href: suiteUrl('prozesse', '/prozess') },
+  { key: 'brain',       label: 'Brain',       href: modulHref('brain'), heart: true },
+  { key: 'eingang',     label: 'Eingang',     href: modulHref('eingang') },
+  { key: 'crm',         label: 'CRM',         href: modulHref('crm') },
+  { key: 'sales',       label: 'Sales',       href: modulHref('sales') },
+  { key: 'marketing',   label: 'Marketing',   href: modulHref('marketing') },
+  { key: 'finance',     label: 'Finance',     href: modulHref('finance') },
+  { key: 'prozesse',    label: 'Prozesse',    href: modulHref('prozesse') },
+  { key: 'transkripte', label: 'Transkripte', href: modulHref('transkripte') },
 ];
 
 // Modul-Leiste an Sichtbarkeit koppeln (v0.18.0, verschaerft v0.23.0).
