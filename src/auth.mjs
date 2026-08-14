@@ -13,7 +13,7 @@
 // Trägt ab Tag 1 {uid,tenant,role} → Stufe 2 (Marcus/Rollen) und Stufe 3 (Mandanten) ohne Auth-Umbau.
 
 import crypto from 'node:crypto';
-import { FONT_HREF, SUITE_LEGACY_DOMAIN, legacyZiel, requestPrefix, withBasePath } from './tokens.mjs';
+import { FONT_HREF, SUITE_LEGACY_DOMAIN, SUITE_ZENTRAL_URL, legacyZiel, requestPrefix, withBasePath, zentralZiel } from './tokens.mjs';
 import { wordmarkSvg } from './logo.mjs';
 
 const COOKIE = 'gf_session';
@@ -178,11 +178,13 @@ export function mountSuiteAuth(app, opts = {}) {
   // Alt-Domain-Weiche (v0.28.0). Steht VOR den Login-Routen und vor dem Gate, damit ein Aufruf
   // auf der alten Adresse gar nicht erst in die Anmeldung läuft und dort ein `next` auf die alte
   // Domain einsammelt. Ohne SUITE_LEGACY_DOMAIN ist das ein No-op.
-  if (SUITE_LEGACY_DOMAIN) {
+  if (SUITE_LEGACY_DOMAIN || SUITE_ZENTRAL_URL) {
     app.use((req, res, next) => {
       if (istOeffentlich(req.path)) return next();
       if (bypass && bypass(req)) return next(); // Server-zu-Server mit Token: nicht umbiegen
-      const ziel = legacyZiel(req.hostname, req.originalUrl);
+      // Zentrale Domain hat Vorrang: seit v0.30.0 gehen Alt-Hosts direkt auf den Suite-Pfad
+      // statt erst auf die Subdomain der neuen Domain (die selbst wieder Alt-Host wäre).
+      const ziel = zentralZiel(req.hostname, req.originalUrl) || legacyZiel(req.hostname, req.originalUrl);
       if (!ziel) return next();
       return res.redirect(301, ziel);
     });

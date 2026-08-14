@@ -38,6 +38,16 @@ import { baseCss, suiteTopbar, MODULES } from '@ki-impact/studio-shell';
 
 So bekommt jedes Studio Shell-Updates bewusst, nicht versehentlich.
 
+## Zentrale Suite-Domain (SUITE_ZENTRAL_URL, seit v0.30.0)
+
+Ist `SUITE_ZENTRAL_URL` gesetzt (z. B. `https://studio.ki-impact.de`), leitet die
+Alt-Domain-Weiche in `mountSuiteAuth` Aufrufe auf Alt-Hosts — Subdomains der
+`SUITE_DOMAIN` wie der `SUITE_LEGACY_DOMAIN` — per 301 auf dieselbe Route unter der
+zentralen Domain um (`SUITE_BASE_PATH` wird davorgehängt). Ausgenommen bleiben wie
+bisher die `open`-/`openPrefix`-Routen und `bypass`-Treffer (Webhooks, /healthz),
+damit extern hinterlegte Adressen weiterlaufen. `zentralZiel()` hat Vorrang vor
+`legacyZiel()`.
+
 ## Pfad-Präfix statt eigener Subdomain (SUITE_BASE_PATH)
 
 Ein Studio kann statt einer eigenen Subdomain unter einem Pfad derselben Suite-Domain laufen,

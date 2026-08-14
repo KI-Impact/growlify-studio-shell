@@ -132,6 +132,25 @@ export function withBasePath(pfad = '/') {
   return SUITE_BASE_PATH + pfad;
 }
 
+// Zentrale Suite-Domain (v0.30.0): ist SUITE_ZENTRAL_URL gesetzt (z.B.
+// https://studio.ki-impact.de), leiten Aufrufe auf Alt-Hosts — Subdomains der SUITE_DOMAIN
+// wie der SUITE_LEGACY_DOMAIN — auf dieselbe Route unter der zentralen Domain um. Die Studios
+// sind selbst-präfixiert (/crm, /sales, …), deshalb reicht der Host-Tausch; SUITE_BASE_PATH
+// wird davorgehängt (Marketing: Routing-Präfix /marketing bei internem BASE /content).
+// Unbekannte Hosts (localhost, Container-IP, Fremd-Domains) bleiben unangetastet.
+export const SUITE_ZENTRAL_URL = (process.env.SUITE_ZENTRAL_URL || '').trim().replace(/\/+$/, '');
+export function zentralZiel(host, pfad = '/') {
+  if (!SUITE_ZENTRAL_URL || !host) return null;
+  const h = String(host).toLowerCase().split(':')[0];
+  let zentralHost;
+  try { zentralHost = new URL(SUITE_ZENTRAL_URL).hostname.toLowerCase(); } catch { return null; }
+  if (h === zentralHost) return null; // schon zentral — Selbst-Redirect vermeiden
+  const istAlt = [SUITE_DOMAIN, SUITE_LEGACY_DOMAIN].filter(Boolean)
+    .some((d) => h.endsWith('.' + d.toLowerCase()));
+  if (!istAlt) return null;
+  return SUITE_ZENTRAL_URL + SUITE_BASE_PATH + pfad;
+}
+
 // Pfad-Präfix aus dem Reverse-Proxy (vNext, Suite-Domain studio.ki-impact.de). Traefik routet
 // dort per Host+PathPrefix(/marketing) MIT StripPrefix auf das Studio: die App sieht Pfade
 // OHNE das Präfix, bekommt es aber im Header X-Forwarded-Prefix mitgeteilt. Anders als
