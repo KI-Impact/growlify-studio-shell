@@ -46,6 +46,20 @@ function readCookie(req, name = COOKIE) {
   const m = (req.headers.cookie || '').match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
   return m ? decodeURIComponent(m[1]) : null;
 }
+// Der Browser kann MEHRERE gf_session-Cookies schicken (z. B. Prod-Cookie auf .ki-impact.de
+// plus Staging-Cookie auf .dev.ki-impact.de — die Elterndomain deckt Subdomains mit ab).
+// Deshalb nicht nur den ersten Treffer prüfen, sondern jeden Kandidaten gegen unser Secret —
+// der erste gültige gewinnt. Sonst sperrt ein fremdes (anders signiertes) Cookie den Login.
+export function verifyAnySession(req, secret, name = COOKIE) {
+  const re = new RegExp('(?:^|; )' + name + '=([^;]+)', 'g');
+  const header = req.headers.cookie || '';
+  let m;
+  while ((m = re.exec(header))) {
+    const sess = verifySession(decodeURIComponent(m[1]), secret);
+    if (sess) return sess;
+  }
+  return null;
+}
 function cookieHeader(token, { domain, maxAge = 60 * 60 * 24 * 30, clear = false } = {}) {
   let c = `${COOKIE}=${clear ? '' : token}; Path=/; HttpOnly; SameSite=Lax`;
   c += clear ? '; Max-Age=0' : `; Max-Age=${maxAge}`;
@@ -175,7 +189,7 @@ export function mountSuiteAuth(app, opts = {}) {
   }
 
   app.get(loginPath, (req, res) => {
-    if (authSecret && verifySession(readCookie(req), authSecret)) return res.redirect(302, req.query.next || mitPrefix(req, withBasePath('/')));
+    if (authSecret && verifyAnySession(req, authSecret)) return res.redirect(302, req.query.next || mitPrefix(req, withBasePath('/')));
     if (loginUrl) return res.redirect(302, loginUrl + (req.query.next ? '?next=' + encodeURIComponent(req.query.next) : ''));
     // Ohne validate und ohne erlaubten Passwort-Login gäbe die Maske ein Feld aus, das nichts
     // mehr bewirkt. Dann lieber eine ehrliche Ansage als ein Formular, das immer fehlschlägt.
@@ -258,7 +272,7 @@ export function mountSuiteAuth(app, opts = {}) {
     if (p === loginPath || p === logoutPath || isOpen(p)) return next();
     if (bypass && bypass(req)) return next();
     if (authSecret) { // Suite-Session-Modus
-      const sess = verifySession(readCookie(req), authSecret);
+      const sess = verifyAnySession(req, authSecret);
       if (sess) { req.suiteUser = sess; return next(); }
       const target = loginUrl || mitPrefix(req, loginPath); // externe Login-URL (Brain) oder lokale Maske
       if (req.method === 'GET') {

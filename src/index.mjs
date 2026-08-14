@@ -60,4 +60,4 @@ export { systemSection, systemCss, healthRows, feedRows, learningRows, fmtDe, AR
 export { ensureSyslog, logEvent, readFeed } from './syslog.mjs';
 export { MODULES as modules } from './tokens.mjs';
 export { ICONS, icon, fold, foldSec } from './components.mjs';
-export { mountSuiteAuth, signSession, verifySession, loginPage, hashPassword, verifyPassword } from './auth.mjs';
+export { mountSuiteAuth, signSession, verifySession, verifyAnySession, loginPage, hashPassword, verifyPassword } from './auth.mjs';
