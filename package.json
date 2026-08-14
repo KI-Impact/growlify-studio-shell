@@ -1,6 +1,6 @@
 {
   "name": "@ki-impact/studio-shell",
-  "version": "0.31.1",
+  "version": "0.32.0",
   "description": "Geteilte Suite-Shell für die Studios des KI Impact Business Studio: Tokens, Topbar mit Modul-Switcher, System-Sektion. Framework-frei, server-rendered (HTML-Strings).",
   "type": "module",
   "main": "src/index.mjs",
@@ -19,7 +19,8 @@
   },
   "license": "UNLICENSED",
   "private": true,
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "express": "^5.2.1"
   }
 }

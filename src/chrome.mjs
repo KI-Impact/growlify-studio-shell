@@ -109,6 +109,11 @@ export function suiteChrome({
   // logoutHref } — null lässt den Block weg (z.B. Seiten ohne Suite-Session).
   account = null,
 } = {}) {
+  // Aktiv-Punkt-Wächter (v0.32.0): ein unbekannter active-Key markierte bisher still
+  // einfach nichts (so entstand der prozess/prozesse-Tippfehler). Laut warnen statt raten.
+  if (active && !modules.some((m) => m.key === active)) {
+    console.warn(`[studio-shell] suiteChrome: unbekannter active-Key "${active}" — kein Modul wird markiert. Gültig: ${modules.map((m) => m.key).join(', ')}`);
+  }
   const home = homeHref || (modules.find((m) => m.key === 'brain') || {}).href || '/';
 
   const pill = (m) => {
