@@ -1,6 +1,6 @@
 {
   "name": "@ki-impact/studio-shell",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "description": "Geteilte Suite-Shell für die Studios des KI Impact Business Studio: Tokens, Topbar mit Modul-Switcher, System-Sektion. Framework-frei, server-rendered (HTML-Strings).",
   "type": "module",
   "main": "src/index.mjs",

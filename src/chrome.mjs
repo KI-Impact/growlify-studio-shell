@@ -16,6 +16,12 @@ const T = TOKENS;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const FONT = "'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif";
 const STILL = '#C7C9C2';
+// Aktiv-Markierung (17.08.2026): der aktive Modul-Chip war satt in --brand gefüllt und stand
+// damit im selben Grün wie die Status-Punkte direkt daneben. Jetzt eine leichte Tönung des
+// Brand-Grüns als Fläche (≈12 % über Weiss), dunkle Schrift, dezente Kontur. Die Status-Punkte
+// bleiben die einzigen Elemente in der satten Signalfarbe.
+const AKTIV_FLAECHE = '#E7FCF1';
+const AKTIV_KONTUR = 'rgba(19,228,137,.38)';
 const GRAD = `linear-gradient(135deg,${T.brand},${T.accent})`;
 
 const ic = (name, size = 16) => ICONS[name]
@@ -50,9 +56,9 @@ export function chromeCss() {
 .gsc-wm-img{display:block;height:100%;width:auto}
 .gsc-tag{font-size:10.5px;color:${T.fg2};border:1px solid ${T.border};border-radius:999px;padding:1px 8px}
 .gsc-mods{display:flex;align-items:center;gap:3px;margin-left:auto;flex-wrap:wrap}
-.gsc-mod{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:500;color:${T.fg2};text-decoration:none;white-space:nowrap}
+.gsc-mod{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:500;color:${T.fg2};text-decoration:none;white-space:nowrap;border:1px solid transparent}
 .gsc-mod:hover{background:${T.surface2};text-decoration:none}
-.gsc-mod[aria-current=page]{background:${T.brand};color:${T.brandInk};font-weight:600}
+.gsc-mod[aria-current=page]{background:${AKTIV_FLAECHE};color:${T.brandInk};border-color:${AKTIV_KONTUR};font-weight:600}
 .gsc-dot{width:7px;height:7px;border-radius:999px;background:${STILL};display:inline-block;flex:none}
 /* ---- Layout: Seitenleiste + Inhalt ---- */
 .gsc-shell{display:flex;min-height:calc(100vh - 46px);align-items:stretch}
@@ -65,7 +71,7 @@ export function chromeCss() {
 .gsc-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;font-size:13.5px;font-weight:500;color:${T.fg2};text-decoration:none;cursor:pointer;border:0;background:none;font-family:inherit;text-align:left;width:100%}
 .gsc-item svg{opacity:.8}
 .gsc-item:hover{background:${T.surface2};text-decoration:none;color:${T.fg1}}
-.gsc-item.on{color:#1f7a52;background:linear-gradient(135deg,rgba(101,251,184,.28),rgba(44,154,105,.14));font-weight:600}
+.gsc-item.on{color:${T.brandInk};background:${AKTIV_FLAECHE};box-shadow:inset 0 0 0 1px ${AKTIV_KONTUR};font-weight:600}
 .gsc-item.on svg{opacity:1}
 .gsc-side-foot{margin-top:auto;padding-top:12px;border-top:1px solid ${T.border};display:flex;flex-direction:column;gap:2px}
 .gsc-account{padding-top:10px;margin-top:10px;border-top:1px solid ${T.border};display:flex;flex-direction:column;gap:3px}
