@@ -7,7 +7,7 @@ import { wordmarkSvg } from './logo.mjs';
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const T = TOKENS;
-const FONT = "'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif";
+const FONT = "'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif";
 const STILL = '#C7C9C2';
 const dotBg = (s) => (s === 'ok' ? T.ok : s === 'warn' ? T.warn : s === 'fail' ? T.fail : STILL);
 
