@@ -3,3 +3,6 @@ node_modules/
 *.log
 index.html
 preview.html
+
+# AgentHub lokaler Codegraph-Index (nicht ins Repo)
+.codegraph/
